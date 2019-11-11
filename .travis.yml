@@ -8,7 +8,7 @@ branches:
 
 julia:
   - "1.2"
-  - nightly
+  - "1.3"
 
 language: julia
 
