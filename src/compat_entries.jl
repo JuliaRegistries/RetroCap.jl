@@ -74,11 +74,8 @@ function generate_compat_entry(::NoCompatEntry,
                                current_compat_entry::Union{Vector, String},
                                spec::Pkg.Types.VersionSpec,
                                latest_dep_version::VersionNumber)
-    if length(current_compat_entry) == 0
-        return new_compat_entry(current_compat_entry, latest_dep_version)
-    else
-        return current_compat_entry
-    end
+    always_assert( length(current_compat_entry) > 0 )
+    return current_compat_entry
 end
 
 function generate_compat_entry(::NoUpperBound,
