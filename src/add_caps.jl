@@ -77,9 +77,7 @@ function add_caps!(compat::AbstractDict{VersionNumber, <:Any},
                    pkg_path::String,
                    version::VersionNumber)
     if haskey(deps, version)
-        if !haskey(compat, version)
-            compat[version] = Dict{Any, Any}()
-        end
+        always_assert(haskey(compat, version))
         for dep in keys(deps[version])
             if !is_stdlib(dep)
                 latest_dep_version = pkg_to_latest_version[Package(dep)]
