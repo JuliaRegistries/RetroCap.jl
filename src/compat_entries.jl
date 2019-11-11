@@ -5,12 +5,10 @@ function generate_compat_entry(latest_dep_version::VersionNumber)::String
     major = latest_dep_version.major
     minor = latest_dep_version.minor
     patch = latest_dep_version.patch
-    compat = "< $(major).$(minor).$(patch + 1)"
-    @assert Pkg.Types.semver_spec(compat) isa Pkg.Types.VersionSpec
+    compat = "0 - $(major).$(minor).$(patch)"
+    @assert Pkg.Types.VersionRange(compat) isa Pkg.Types.VersionRange
     return compat
 end
-
-
 
 function generate_compat_entry(strategy::CapStrategy, current_compat_entry, latest_dep_version::VersionNumber)
     if length(current_compat_entry) == 0
