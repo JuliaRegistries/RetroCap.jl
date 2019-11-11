@@ -41,9 +41,10 @@ function compress_versions(pool::Vector{VersionNumber}, subset::Vector{VersionNu
         end
     end
 end
-function compress_versions(pool::Vector{VersionNumber}, subset)
-    compress_versions(pool, filter(in(subset), pool))
-end
+
+# function compress_versions(pool::Vector{VersionNumber}, subset)
+#     compress_versions(pool, filter(in(subset), pool))
+# end
 
 function load_versions(path::String)
     versions_file = joinpath(dirname(path), "Versions.toml")
