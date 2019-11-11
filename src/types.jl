@@ -1,6 +1,10 @@
 import Pkg
 import UUIDs
 
+struct AlwaysAssertionError <: Exception
+    msg::String
+end
+
 abstract type CapStrategy end
 
 struct NoCompatEntry <: CapStrategy
