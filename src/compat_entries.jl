@@ -23,18 +23,28 @@ function new_compat_entry(latest_dep_version::VersionNumber)::String
     return new_compat_entry(lower_bound, latest_dep_version)
 end
 
+function _compute_cap_upper_bound(latest_dep_version::VersionNumber)::String
+    x = latest_dep_version.major
+    y = latest_dep_version.minor
+    z = latest_dep_version.patch
+    if x == 0
+        if y == 0 # x is 0 and y is 0
+            return "0.0.$(z)"
+        else # x is 0 and y is nonzero
+            return "0.$(y)"
+        end
+    else # x is nonzero
+        return "$(x)"
+    end
+end
+
 function new_compat_entry(lower_bound::VersionNumber,
                           latest_dep_version::VersionNumber)::String
     a = lower_bound.major
     b = lower_bound.minor
     c = lower_bound.patch
-    
-    x = latest_dep_version.major
-    y = latest_dep_version.minor
-    z = latest_dep_version.patch
-    
-    compat = "$(a).$(b).$(c) - $(x).$(y).$(z)"
-    
+    upper_bound = _compute_cap_upper_bound(latest_dep_version)    
+    compat = "$(a).$(b).$(c) - $(upper_bound)"
     @assert Pkg.Types.VersionRange(compat) isa Pkg.Types.VersionRange
     return compat
 end
