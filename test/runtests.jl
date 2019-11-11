@@ -14,6 +14,18 @@ Test.@testset "RetroCap.jl" begin
         Test.@test Test.@test_nowarn RetroCap.always_assert(true) == nothing
         Test.@test_throws RetroCap.AlwaysAssertionError RetroCap.always_assert(false)
     end
+    Test.@testset "compat_entries.jl" begin
+        Test.@testset "_compute_cap_upper_bound" begin
+            Test.@test RetroCap._compute_cap_upper_bound(v"1.2.3") == "1"
+            Test.@test RetroCap._compute_cap_upper_bound(v"1.2.0") == "1"
+            Test.@test RetroCap._compute_cap_upper_bound(v"1.0.3") == "1"
+            Test.@test RetroCap._compute_cap_upper_bound(v"1.0.0") == "1"
+            Test.@test RetroCap._compute_cap_upper_bound(v"0.2.3") == "0.2"
+            Test.@test RetroCap._compute_cap_upper_bound(v"0.2.0") == "0.2"
+            Test.@test RetroCap._compute_cap_upper_bound(v"0.0.3") == "0.0.3"
+            Test.@test RetroCap._compute_cap_upper_bound(v"0.0.0") == "0.0.0"
+        end
+    end
     Test.@testset "Run on the General registry" begin
         RetroCap.with_temp_dir() do tmp_dir
             cd(tmp_dir)
