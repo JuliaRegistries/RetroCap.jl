@@ -6,6 +6,11 @@
 RetroCap adds compat bounds to all versions of a package **except the latest
 version**.
 
+## Installation
+```julia
+] add https://github.com/bcbi/RetroCap.jl#master
+```
+
 ## Example usage
 
 The recommended strategy is `NoUpperBound`. The `NoUpperBound` strategy will:
