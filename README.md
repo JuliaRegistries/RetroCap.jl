@@ -3,8 +3,9 @@
 [![Build Status](https://travis-ci.com/bcbi/RetroCap.jl.svg?branch=master)](https://travis-ci.com/bcbi/RetroCap.jl)
 [![Codecov](https://codecov.io/gh/bcbi/RetroCap.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/bcbi/RetroCap.jl)
 
-RetroCap adds compat bounds to all versions of a package **except the latest
-version**.
+RetroCap retroactively add "caps" (upper-bounded compat entries) to all packages in a registry.
+
+More specifically, RetroCap adds upper-bounded compat entries to every version of every package in a registry **except the latest version of each package**.
 
 ## Installation
 ```julia
