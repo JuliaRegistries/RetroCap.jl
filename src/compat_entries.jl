@@ -82,14 +82,11 @@ function generate_compat_entry(::NoUpperBound,
                                current_compat_entry::Union{Vector, String},
                                spec::Pkg.Types.VersionSpec,
                                latest_dep_version::VersionNumber)
-    if length(current_compat_entry) == 0
-        return new_compat_entry(current_compat_entry, latest_dep_version)
+    always_assert( length(current_compat_entry) > 0 )
+    if has_upper_bound(spec)
+        return current_compat_entry
     else
-        if has_upper_bound(spec)
-            return current_compat_entry
-        else
-            return new_compat_entry(current_compat_entry, latest_dep_version)
-        end
+        return new_compat_entry(current_compat_entry, latest_dep_version)
     end
 end
 
