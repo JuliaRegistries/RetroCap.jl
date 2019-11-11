@@ -1,0 +1,13 @@
+name = "RetroCap"
+uuid = "d77cfa7a-8890-4952-b292-ef424e435f4a"
+authors = ["Dilum Aluthge", "Brown Center for Biomedical Informatics"]
+version = "0.1.0"
+
+[compat]
+julia = "1.1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
