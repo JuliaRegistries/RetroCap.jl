@@ -11,13 +11,13 @@ using Test
             cd(tmp_dir)
             run(`git clone https://github.com/JuliaRegistries/General.git`)
             cd("General")
-            add_caps(NoCompatEntry(), pwd())
+            add_caps(NoCompatEntry(), strip(pwd()))
         end
         RetroCap.with_temp_dir() do tmp_dir
             cd(tmp_dir)
             run(`git clone https://github.com/JuliaRegistries/General.git`)
             cd("General")
-            add_caps(NoUpperBound(), pwd())
+            add_caps(NoUpperBound(), strip(pwd()))
         end
     end
 
