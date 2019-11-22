@@ -9,7 +9,7 @@ More specifically, RetroCap adds upper-bounded compat entries to every version o
 
 ## Installation
 ```julia
-] add https://github.com/bcbi/RetroCap.jl#master
+Pkg.add("RetroCap")
 ```
 
 ## Example
