@@ -12,7 +12,9 @@ More specifically, RetroCap adds upper-bounded compat entries to every version o
 ] add https://github.com/bcbi/RetroCap.jl#master
 ```
 
-## Example usage
+## Example
+
+### Run on all repos in a registry
 
 The recommended strategy is `NoUpperBound`. The `NoUpperBound` strategy will:
 1. Add compat entries if they are missing
@@ -33,6 +35,37 @@ julia> run(`git clone https://github.com/JuliaRegistries/General.git`)
 julia> cd("General")
 julia> using RetroCap
 julia> add_caps(NoCompatEntry(), pwd())
+```
+
+### Run only on repos in a specific GitHub organization
+
+```julia
+using GitHub
+
+using RetroCap
+
+auth = GitHub.authenticate("ENV["GITHUB_AUTH"]") # you need to set this in your ENV
+
+orgrepos = GitHub.repos("JuliaDiffEq", auth = auth)[1] # replace JuliaDiffEq with the name of your GitHub organization
+
+run(`git clone https://github.com/JuliaRegistries/General.git`)
+
+cd("General")
+
+pkgs = [RetroCap.Package(r.name[1:end-3]) for r in orgrepos]
+
+pkg_to_path, pkg_to_num_versions, pkg_to_latest_version = RetroCap.parse_registry(pwd())
+
+for pkg in pkgs
+    try
+        add_caps(NoUpperBound(),pwd(),
+                 pkg_to_latest_version,
+                 pkg,
+                 pkg_to_path[pkg])
+    catch
+        println("Package $pkg not affected")
+    end
+end
 ```
 
 ## Acknowledgements
