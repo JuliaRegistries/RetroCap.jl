@@ -25,6 +25,12 @@ Test.@testset "RetroCap.jl" begin
             Test.@test RetroCap._compute_cap_upper_bound(v"0.0.3") == "0.0.3"
             Test.@test RetroCap._compute_cap_upper_bound(v"0.0.0") == "0.0.0"
         end
+        Test.@testset "_extract_lower_bound" begin
+            Test.@test RetroCap._extract_lower_bound("1.2.3 - foo") == v"1.2.3"
+            Test.@test RetroCap._extract_lower_bound("1.2 - foo") == v"1.2"
+            Test.@test RetroCap._extract_lower_bound("1 - foo") == v"1"
+            Test.@test RetroCap._extract_lower_bound(" - foo") == nothing
+        end
         Test.@testset "has_upper_bound" begin
             Test.@test !RetroCap.has_upper_bound(Pkg.Types.semver_spec(">=0"); aggressive = false)
             Test.@test !RetroCap.has_upper_bound(Pkg.Types.semver_spec(">=0"); aggressive = true)
@@ -32,6 +38,8 @@ Test.@testset "RetroCap.jl" begin
             Test.@test !RetroCap.has_upper_bound(Pkg.Types.semver_spec(">=1"); aggressive = true)
             Test.@test RetroCap.has_upper_bound(Pkg.Types.semver_spec("0"); aggressive = false)
             Test.@test !RetroCap.has_upper_bound(Pkg.Types.semver_spec("0"); aggressive = true)
+            Test.@test RetroCap.has_upper_bound(Pkg.Types.VersionSpec("0-2"); aggressive = false)
+            Test.@test RetroCap.has_upper_bound(Pkg.Types.VersionSpec("0-2"); aggressive = true)
         end
     end
     Test.@testset "Run on the General registry" begin

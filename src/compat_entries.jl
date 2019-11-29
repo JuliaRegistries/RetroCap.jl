@@ -6,15 +6,31 @@ function new_compat_entry(current_compat_entry::Vector,
     return new_compat_entry(latest_dep_version)
 end
 
+function _extract_lower_bound(current_compat_entry::String)
+    myregex1 = r"([\d]*)\.([\d]*)\.([\d]*)[\s]*-[\s]*"
+    myregex2 = r"([\d]*)\.([\d]*)[\s]*-[\s]*"
+    myregex3 = r"(\d[\d]*)[\s]*-[\s]*"
+    if occursin(myregex1, current_compat_entry)
+        m1 = match(myregex1, current_compat_entry)
+        return VersionNumber("$(m1[1]).$(m1[2]).$(m1[3])")
+    elseif occursin(myregex2, current_compat_entry)
+        m2 = match(myregex2, current_compat_entry)
+        return VersionNumber("$(m2[1]).$(m2[2])")
+    elseif occursin(myregex3, current_compat_entry)
+        m3 = match(myregex3, current_compat_entry)
+        return VersionNumber("$(m3[1])")
+    else
+        return nothing
+    end
+end
+
 function new_compat_entry(current_compat_entry::String,
                           latest_dep_version::VersionNumber)::String
-    myregex_1 = r"([\d]*)\.([\d]*)\.([\d]*)[\s]*-[\s]*\*"
-    if occursin(myregex_1, current_compat_entry)
-        m = match(myregex_1, current_compat_entry)
-        lower_bound = VersionNumber("$(m[1]).$(m[2]).$(m[3])")
-        return new_compat_entry(lower_bound, latest_dep_version)
-    else
+    lower_bound = _extract_lower_bound(current_compat_entry)
+    if lower_bound isa Nothing
         return new_compat_entry(latest_dep_version)
+    else
+        return new_compat_entry(lower_bound, latest_dep_version)
     end
 end
 
@@ -115,15 +131,32 @@ function has_upper_bound(spec::Pkg.Types.VersionSpec; aggressive::Bool)::Bool
     end
 end
 
+function _includes_infinity(spec::Pkg.Types.VersionSpec)::Bool
+    max_component = typemax(Base.VInt)
+    infinity_A = typemax(VersionNumber)
+    infinity_B = VersionNumber(max_component, max_component, max_component)
+    return (infinity_A in spec) || (infinity_B in spec)
+end
+
+function _does_not_include_infinity(spec::Pkg.Types.VersionSpec)::Bool
+    return !_includes_infinity(spec)
+end
+
+function _is_zero(spec::Pkg.Types.VersionSpec)::Bool
+    max_component = typemax(Base.VInt)
+    _zero_max = VersionNumber(0, max_component, max_component)
+    _one = v"1"
+    return (_zero_max in spec) && !(_one in spec)
+end
+
+function _is_not_zero(spec::Pkg.Types.VersionSpec)::Bool
+    return !_is_zero(spec)
+end
+
 function has_upper_bound(spec::Pkg.Types.VersionSpec, ::NotAggressive)::Bool
-    a = !(_upper_bound_A in spec)
-    b = !(_upper_bound_B in spec)
-    return a && b
+    return _does_not_include_infinity(spec)
 end
 
 function has_upper_bound(spec::Pkg.Types.VersionSpec, ::Aggressive)::Bool
-    a = !(_upper_bound_A in spec)
-    b = !(_upper_bound_B in spec)
-    c = !(_upper_bound_C in spec)
-    return a && b && c
+    return _does_not_include_infinity(spec) && _is_not_zero(spec)
 end

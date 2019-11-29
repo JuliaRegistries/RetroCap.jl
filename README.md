@@ -44,9 +44,9 @@ using GitHub
 
 using RetroCap
 
-auth = GitHub.authenticate("ENV["GITHUB_AUTH"]") # you need to set this in your ENV
+auth = GitHub.authenticate("ENV["GITHUB_AUTH"]")
 
-orgrepos = GitHub.repos("JuliaDiffEq", auth = auth)[1] # replace JuliaDiffEq with the name of your GitHub organization
+orgrepos = GitHub.repos("MY_GITHUB_ORGANIZATION", auth = auth)[1]
 
 run(`git clone https://github.com/JuliaRegistries/General.git`)
 
@@ -58,12 +58,13 @@ pkg_to_path, pkg_to_num_versions, pkg_to_latest_version = RetroCap.parse_registr
 
 for pkg in pkgs
     try
-        add_caps(NoUpperBound(),pwd(),
+        add_caps(NoUpperBound(),
+                 pwd(),
                  pkg_to_latest_version,
                  pkg,
                  pkg_to_path[pkg])
     catch
-        println("Package $pkg not affected")
+        println("Package $(pkg) not affected")
     end
 end
 ```
