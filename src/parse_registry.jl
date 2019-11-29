@@ -29,7 +29,7 @@ function parse_registry!(pkg_to_path::AbstractDict{Package, String},
     for p in packages
         name = p[2]["name"]
         pkg_path = p[2]["path"]
-        if !endswith(name, "_jll")
+        if !is_jll(name)
             all_versions = get_all_versions(registry_path, pkg_path)
             num_versions = length(all_versions)
             latest_version = maximum(all_versions)

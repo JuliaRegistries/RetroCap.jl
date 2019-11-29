@@ -25,15 +25,23 @@ Test.@testset "RetroCap.jl" begin
             Test.@test RetroCap._compute_cap_upper_bound(v"0.0.3") == "0.0.3"
             Test.@test RetroCap._compute_cap_upper_bound(v"0.0.0") == "0.0.0"
         end
+        Test.@testset "has_upper_bound" begin
+            Test.@test !RetroCap.has_upper_bound(Pkg.Types.semver_spec(">=0"); aggressive = false)
+            Test.@test !RetroCap.has_upper_bound(Pkg.Types.semver_spec(">=0"); aggressive = true)
+            Test.@test !RetroCap.has_upper_bound(Pkg.Types.semver_spec(">=1"); aggressive = false)
+            Test.@test !RetroCap.has_upper_bound(Pkg.Types.semver_spec(">=1"); aggressive = true)
+            Test.@test RetroCap.has_upper_bound(Pkg.Types.semver_spec("0"); aggressive = false)
+            Test.@test !RetroCap.has_upper_bound(Pkg.Types.semver_spec("0"); aggressive = true)
+        end
     end
     Test.@testset "Run on the General registry" begin
-        # RetroCap.with_temp_dir() do tmp_dir
-        #     cd(tmp_dir)
-        #     run(`git clone https://github.com/JuliaRegistries/General.git`)
-        #     cd("General")
-            # RetroCap.add_caps(RetroCap.NoCompatEntry(),
-            #                   strip(pwd()))
-        # end
+        RetroCap.with_temp_dir() do tmp_dir
+            cd(tmp_dir)
+            run(`git clone https://github.com/JuliaRegistries/General.git`)
+            cd("General")
+            RetroCap.add_caps(RetroCap.NoCompatEntry(),
+                              strip(pwd()))
+        end
         RetroCap.with_temp_dir() do tmp_dir
             cd(tmp_dir)
             run(`git clone https://github.com/JuliaRegistries/General.git`)
@@ -51,13 +59,13 @@ Test.@testset "RetroCap.jl" begin
                               aggressive = true)
         end
 
-        # RetroCap.with_temp_dir() do tmp_dir
-        #     cd(tmp_dir)
-        #     run(`git clone https://github.com/JuliaRegistries/General.git`)
-        #     cd("General")
-            # RetroCap.add_caps(RetroCap.NoUpperBound(),
-                              # strip(pwd()))
-        # end
+        RetroCap.with_temp_dir() do tmp_dir
+            cd(tmp_dir)
+            run(`git clone https://github.com/JuliaRegistries/General.git`)
+            cd("General")
+            RetroCap.add_caps(RetroCap.NoUpperBound(),
+                              strip(pwd()))
+        end
         RetroCap.with_temp_dir() do tmp_dir
             cd(tmp_dir)
             run(`git clone https://github.com/JuliaRegistries/General.git`)

@@ -17,8 +17,12 @@ function _strip(v::AbstractVector{<:AbstractString})::Vector{String}
     return result
 end
 
-@inline function is_stdlib(name::String)::Bool
-    return name in values(Pkg.Types.stdlib())
+@inline function is_stdlib(name::AbstractString)::Bool
+    return strip(name) in values(Pkg.Types.stdlib())
+end
+
+@inline function is_jll(name::AbstractString)::Bool
+    return endswith(lowercase(strip(name)), "_jll")
 end
 
 function with_temp_dir(f::Function)
