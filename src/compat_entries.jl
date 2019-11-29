@@ -67,7 +67,8 @@ end
 
 function generate_compat_entry(strategy::CapStrategy,
                                current_compat_entry::Union{Vector, String},
-                               latest_dep_version::VersionNumber;
+                               latest_dep_version::VersionNumber,
+                               latest_dep_zero_version::VersionNumber;
                                aggressive::Bool)
     if length(current_compat_entry) == 0
         return new_compat_entry(current_compat_entry, latest_dep_version)

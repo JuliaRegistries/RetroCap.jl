@@ -37,3 +37,13 @@ function with_temp_dir(f::Function)
     rm(tmp_dir; force = true, recursive = true)
     return result
 end
+
+function _get_latest_version(versions::AbstractVector{VersionNumber})
+    return maximum(versions)
+end
+
+function _get_latest_zero_version(versions::AbstractVector{VersionNumber})
+    all_zero_versions = filter((x) -> (x < v"1"), versions)
+    push!(all_zero_versions, v"0.0.1")
+    return maximum(all_zero_versions)
+end

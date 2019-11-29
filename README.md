@@ -3,9 +3,12 @@
 [![Build Status](https://travis-ci.com/bcbi/RetroCap.jl.svg?branch=master)](https://travis-ci.com/bcbi/RetroCap.jl)
 [![Codecov](https://codecov.io/gh/bcbi/RetroCap.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/bcbi/RetroCap.jl)
 
-RetroCap retroactively add "caps" (upper-bounded compat entries) to all packages in a registry.
+RetroCap retroactively add "caps" (upper-bounded compat entries) to all
+packages in a registry.
 
-More specifically, RetroCap adds upper-bounded compat entries to every version of every package in a registry **except the latest version of each package**.
+More specifically, RetroCap adds upper-bounded compat entries to every
+version of every package in a
+registry **except the latest version of each package**.
 
 ## Installation
 ```julia
@@ -39,6 +42,9 @@ julia> add_caps(NoCompatEntry(), pwd())
 
 ### Run only on repos in a specific GitHub organization
 
+First, define an environment variable named `GITHUB_AUTH` that contains a
+GitHub personal access token. Then, run the following script:
+
 ```julia
 using GitHub
 
@@ -54,13 +60,17 @@ cd("General")
 
 pkgs = [RetroCap.Package(r.name[1:end-3]) for r in orgrepos]
 
-pkg_to_path, pkg_to_num_versions, pkg_to_latest_version = RetroCap.parse_registry(pwd())
+pkg_to_path,
+    pkg_to_num_versions,
+    pkg_to_latest_version,
+    pkg_to_latest_zero_version = RetroCap.parse_registry(pwd())
 
 for pkg in pkgs
     try
         add_caps(NoUpperBound(),
                  pwd(),
                  pkg_to_latest_version,
+                 pkg_to_latest_zero_version,
                  pkg,
                  pkg_to_path[pkg])
     catch
