@@ -27,17 +27,52 @@ Test.@testset "RetroCap.jl" begin
         end
     end
     Test.@testset "Run on the General registry" begin
+        # RetroCap.with_temp_dir() do tmp_dir
+        #     cd(tmp_dir)
+        #     run(`git clone https://github.com/JuliaRegistries/General.git`)
+        #     cd("General")
+            # RetroCap.add_caps(RetroCap.NoCompatEntry(),
+            #                   strip(pwd()))
+        # end
         RetroCap.with_temp_dir() do tmp_dir
             cd(tmp_dir)
             run(`git clone https://github.com/JuliaRegistries/General.git`)
             cd("General")
-            RetroCap.add_caps(RetroCap.NoCompatEntry(), strip(pwd()))
+            RetroCap.add_caps(RetroCap.NoCompatEntry(),
+                              strip(pwd());
+                              aggressive = false)
         end
         RetroCap.with_temp_dir() do tmp_dir
             cd(tmp_dir)
             run(`git clone https://github.com/JuliaRegistries/General.git`)
             cd("General")
-            RetroCap.add_caps(RetroCap.NoUpperBound(), strip(pwd()))
+            RetroCap.add_caps(RetroCap.NoCompatEntry(),
+                              strip(pwd());
+                              aggressive = true)
+        end
+
+        # RetroCap.with_temp_dir() do tmp_dir
+        #     cd(tmp_dir)
+        #     run(`git clone https://github.com/JuliaRegistries/General.git`)
+        #     cd("General")
+            # RetroCap.add_caps(RetroCap.NoUpperBound(),
+                              # strip(pwd()))
+        # end
+        RetroCap.with_temp_dir() do tmp_dir
+            cd(tmp_dir)
+            run(`git clone https://github.com/JuliaRegistries/General.git`)
+            cd("General")
+            RetroCap.add_caps(RetroCap.NoUpperBound(),
+                              strip(pwd());
+                              aggressive = false)
+        end
+        RetroCap.with_temp_dir() do tmp_dir
+            cd(tmp_dir)
+            run(`git clone https://github.com/JuliaRegistries/General.git`)
+            cd("General")
+            RetroCap.add_caps(RetroCap.NoUpperBound(),
+                              strip(pwd());
+                              aggressive = true)
         end
     end
 end

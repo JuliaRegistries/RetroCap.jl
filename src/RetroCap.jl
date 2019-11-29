@@ -9,6 +9,9 @@ include("types.jl")
 
 include("Compress.jl")
 
+include("constants.jl")
+include("defaults.jl")
+
 include("add_caps.jl")
 include("assert.jl")
 include("compat_entries.jl")

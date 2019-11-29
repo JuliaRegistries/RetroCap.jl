@@ -16,3 +16,9 @@ end
 struct Package
     name::String
 end
+
+struct Aggressive
+end
+
+struct NotAggressive
+end
