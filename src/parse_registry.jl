@@ -1,9 +1,8 @@
 import Pkg
 import UUIDs
 
-@inline function get_all_versions(registry_path::String,
-                                  pkg_path::String)::Vector{VersionNumber}
-    versions_toml = Pkg.TOML.parsefile(joinpath(registry_path, pkg_path, "Versions.toml"))
+@inline function get_all_versions(pkg_path::String)::Vector{VersionNumber}
+    versions_toml = Pkg.TOML.parsefile(joinpath(pkg_path, "Versions.toml"))
     all_versions = VersionNumber.(collect(keys(versions_toml)))
     unique!(all_versions)
     sort!(all_versions)
@@ -25,7 +24,7 @@ end
     end
 end
 
-@inline function parse_registry(registry_path::String)
+@inline function parse_registry(registry_paths::Vector{String})
     pkg_to_path = Dict{Package, String}()
     pkg_to_num_versions = Dict{Package, Int}()
     pkg_to_latest_version = Dict{Package, VersionNumber}()
@@ -34,7 +33,25 @@ end
                     pkg_to_num_versions,
                     pkg_to_latest_version,
                     pkg_to_latest_zero_version,
-                    registry_path)
+                    registry_paths)
+    return pkg_to_path,
+           pkg_to_num_versions,
+           pkg_to_latest_version,
+           pkg_to_latest_zero_version
+end
+
+@inline function parse_registry!(pkg_to_path::AbstractDict{Package, String},
+                                 pkg_to_num_versions::AbstractDict{Package, Int},
+                                 pkg_to_latest_version::AbstractDict{Package, VersionNumber},
+                                 pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
+                                 registry_paths::Vector{String})
+    for path in registry_paths
+        parse_registry!(pkg_to_path,
+                        pkg_to_num_versions,
+                        pkg_to_latest_version,
+                        pkg_to_latest_zero_version,
+                        path)
+    end
     return pkg_to_path,
            pkg_to_num_versions,
            pkg_to_latest_version,
@@ -50,9 +67,9 @@ end
     packages = registry["packages"]
     for p in packages
         name = p[2]["name"]
-        pkg_path = p[2]["path"]
+        pkg_path = joinpath(registry_path, p[2]["path"])
         if !is_jll(name)
-            all_versions = get_all_versions(registry_path, pkg_path)
+            all_versions = get_all_versions(pkg_path)
             num_versions = length(all_versions)
             latest_version = _get_latest_version(all_versions)
             latest_zero_version = _get_latest_zero_version(all_versions)
