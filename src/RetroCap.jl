@@ -1,7 +1,7 @@
 module RetroCap
 
-export CapStrategy
-export NoUpperBound
+export CapStrategy, UpperBound
+export LatestVersionOption, CapLatestVersion, ExcludeLatestVersion
 export add_caps
 
 include("types.jl")

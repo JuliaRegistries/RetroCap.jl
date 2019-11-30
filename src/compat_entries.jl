@@ -104,7 +104,7 @@ end
 
 @inline function generate_compat_entry(pkg::Package,
                                        dep::Package,
-                                       strategy::NoUpperBound,
+                                       strategy::UpperBound,
                                        current_compat_entry::Union{Vector, String},
                                        spec::Pkg.Types.VersionSpec,
                                        latest_dep_version::VersionNumber,

@@ -7,7 +7,15 @@ end
 
 abstract type CapStrategy end
 
-struct NoUpperBound <: CapStrategy
+struct UpperBound <: CapStrategy
+end
+
+abstract type LatestVersionOption end
+
+struct ExcludeLatestVersion <: LatestVersionOption
+end
+
+struct CapLatestVersion <: LatestVersionOption
 end
 
 struct Package

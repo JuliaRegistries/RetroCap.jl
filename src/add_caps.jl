@@ -2,29 +2,33 @@ import Pkg
 import UUIDs
 
 @inline function add_caps(strategy::CapStrategy,
+                          option::LatestVersionOption,
                           registry_path::AbstractString)
     _registry_paths = Any[registry_path]
-    add_caps(strategy, _registry_paths)
+    add_caps(strategy, option, _registry_paths)
     return nothing
 end
 
 @inline function add_caps(strategy::CapStrategy,
+                          option::LatestVersionOption,
                           registry_paths::AbstractVector)
     _registry_paths = Vector{String}(undef, 0)
     for path in registry_paths
         push!(_registry_paths, strip(path))
     end
-    add_caps(strategy, _registry_paths)
+    add_caps(strategy, option, _registry_paths)
     return nothing
 end
 
 @inline function add_caps(strategy::CapStrategy,
+                          option::LatestVersionOption,
                           registry_paths::Vector{String})
     pkg_to_path,
         pkg_to_num_versions,
         pkg_to_latest_version,
         pkg_to_latest_zero_version = parse_registry(registry_paths)
     add_caps(strategy,
+             option,
              registry_paths,
              pkg_to_path,
              pkg_to_num_versions,
@@ -34,6 +38,7 @@ end
 end
 
 @inline function add_caps(strategy::CapStrategy,
+                          option::LatestVersionOption,
                           registry_paths::Vector{String},
                           pkg_to_path::AbstractDict{Package, String},
                           pkg_to_num_versions::AbstractDict{Package, Int},
@@ -46,6 +51,7 @@ end
         @debug("Package $(i) of $(n)", pkg)
         pkg_path = pkg_to_path[pkg]::String
         add_caps(strategy,
+                 option,
                  registry_paths,
                  pkg_to_latest_version,
                  pkg_to_latest_zero_version,
@@ -56,6 +62,7 @@ end
 end
 
 @inline function add_caps(strategy::CapStrategy,
+                          option::LatestVersionOption,
                           registry_paths::Vector{String},
                           pkg_to_latest_version::AbstractDict{Package, VersionNumber},
                           pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
@@ -71,7 +78,7 @@ end
         m = length(all_versions)
         for j = 1:m
             version = all_versions[j]
-            if version != latest_version
+            if (version != latest_version) | (option isa CapLatestVersion)
                 add_caps!(compat,
                           deps,
                           strategy,
