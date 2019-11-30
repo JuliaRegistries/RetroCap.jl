@@ -1,7 +1,6 @@
 module RetroCap
 
 export CapStrategy
-export NoCompatEntry
 export NoUpperBound
 export add_caps
 
