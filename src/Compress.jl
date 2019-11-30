@@ -13,7 +13,8 @@ Given `pool` as the pool of available versions (of some package) and `subset` as
 subset of the pool of available versions, this function computes a `VersionSpec` which
 includes all versions in `subset` and none of the versions in its complement.
 """
-function compress_versions(pool::Vector{VersionNumber}, subset::Vector{VersionNumber})
+@inline function compress_versions(pool::Vector{VersionNumber},
+                                   subset::Vector{VersionNumber})
     # Explicitly drop prerelease/build numbers, as those can confuse this.
     # TODO: Rewrite all this to use VersionNumbers instead of VersionBounds
     drop_build_prerelease(v::VersionNumber) = VersionNumber(v.major, v.minor, v.patch)
@@ -42,18 +43,18 @@ function compress_versions(pool::Vector{VersionNumber}, subset::Vector{VersionNu
     end
 end
 
-# function compress_versions(pool::Vector{VersionNumber}, subset)
+# @inline function compress_versions(pool::Vector{VersionNumber}, subset)
 #     compress_versions(pool, filter(in(subset), pool))
 # end
 
-function load_versions(path::String)
+@inline function load_versions(path::String)
     versions_file = joinpath(dirname(path), "Versions.toml")
     versions_dict = TOML.parsefile(versions_file)
     sort!([VersionNumber(v) for v in keys(versions_dict)])
 end
 
-function load(path::String,
-    versions::Vector{VersionNumber} = load_versions(path))
+@inline function load(path::String,
+                      versions::Vector{VersionNumber} = load_versions(path))
     compressed = TOML.parsefile(path)
     uncompressed = Dict{VersionNumber,Dict{Any,Any}}()
     for (vers, data) in compressed
@@ -66,8 +67,9 @@ function load(path::String,
     return uncompressed
 end
 
-function compress(path::String, uncompressed::Dict,
-    versions::Vector{VersionNumber} = load_versions(path))
+@inline function compress(path::String,
+                          uncompressed::Dict,
+                          versions::Vector{VersionNumber} = load_versions(path))
     inverted = Dict()
     for (ver, data) in uncompressed, (key, val) in data
         val isa TOML.TYPE || (val = string(val))
@@ -82,8 +84,9 @@ function compress(path::String, uncompressed::Dict,
     return compressed
 end
 
-function save(path::String, uncompressed::Dict,
-    versions::Vector{VersionNumber} = load_versions(path))
+@inline function save(path::String,
+                      uncompressed::Dict,
+                      versions::Vector{VersionNumber} = load_versions(path))
     compressed = compress(path, uncompressed)
     open(path, write=true) do io
         TOML.print(io, compressed, sorted=true)

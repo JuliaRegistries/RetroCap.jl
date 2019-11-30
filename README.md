@@ -3,9 +3,12 @@
 [![Build Status](https://travis-ci.com/bcbi/RetroCap.jl.svg?branch=master)](https://travis-ci.com/bcbi/RetroCap.jl)
 [![Codecov](https://codecov.io/gh/bcbi/RetroCap.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/bcbi/RetroCap.jl)
 
-RetroCap retroactively add "caps" (upper-bounded compat entries) to all packages in a registry.
+RetroCap retroactively add "caps" (upper-bounded `[compat]` entries) to all
+packages in a registry.
 
-More specifically, RetroCap adds upper-bounded compat entries to every version of every package in a registry **except the latest version of each package**.
+More specifically, RetroCap adds upper-bounded `[compat]` entries to every
+version of every package in a
+registry **except the latest version of each package**.
 
 ## Installation
 ```julia
@@ -27,26 +30,19 @@ julia> using RetroCap
 julia> add_caps(NoUpperBound(), pwd())
 ```
 
-The `NoCompatEntry` strategy will only:
-1. Add compat entries if they are missing
-
-```julia
-julia> run(`git clone https://github.com/JuliaRegistries/General.git`)
-julia> cd("General")
-julia> using RetroCap
-julia> add_caps(NoCompatEntry(), pwd())
-```
-
 ### Run only on repos in a specific GitHub organization
+
+First, define an environment variable named `GITHUB_AUTH` that contains a
+GitHub personal access token. Then, run the following script:
 
 ```julia
 using GitHub
 
 using RetroCap
 
-auth = GitHub.authenticate("ENV["GITHUB_AUTH"]") # you need to set this in your ENV
+auth = GitHub.authenticate("ENV["GITHUB_AUTH"]")
 
-orgrepos = GitHub.repos("JuliaDiffEq", auth = auth)[1] # replace JuliaDiffEq with the name of your GitHub organization
+orgrepos, page_data = GitHub.repos("MY_GITHUB_ORGANIZATION", auth = auth)[1]
 
 run(`git clone https://github.com/JuliaRegistries/General.git`)
 
@@ -54,16 +50,21 @@ cd("General")
 
 pkgs = [RetroCap.Package(r.name[1:end-3]) for r in orgrepos]
 
-pkg_to_path, pkg_to_num_versions, pkg_to_latest_version = RetroCap.parse_registry(pwd())
+pkg_to_path,
+    pkg_to_num_versions,
+    pkg_to_latest_version,
+    pkg_to_latest_zero_version = RetroCap.parse_registry(pwd())
 
 for pkg in pkgs
     try
-        add_caps(NoUpperBound(),pwd(),
+        add_caps(NoUpperBound(),
+                 pwd(),
                  pkg_to_latest_version,
+                 pkg_to_latest_zero_version,
                  pkg,
                  pkg_to_path[pkg])
     catch
-        println("Package $pkg not affected")
+        println("Package $(pkg) not affected")
     end
 end
 ```

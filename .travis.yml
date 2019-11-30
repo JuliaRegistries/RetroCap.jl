@@ -6,6 +6,10 @@ branches:
   - /^release\/.*$/ # release branches
   - /^v[0-9]+\.[0-9]+\.[0-9]+$/ # version tags
 
+env:
+  global:
+    - JULIA_DEBUG="all"
+
 julia:
   - "1.2"
   - "1.3"

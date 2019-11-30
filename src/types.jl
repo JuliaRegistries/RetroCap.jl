@@ -7,9 +7,6 @@ end
 
 abstract type CapStrategy end
 
-struct NoCompatEntry <: CapStrategy
-end
-
 struct NoUpperBound <: CapStrategy
 end
 
