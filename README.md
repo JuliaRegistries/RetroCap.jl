@@ -4,11 +4,14 @@
 [![Codecov](https://codecov.io/gh/bcbi/RetroCap.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/bcbi/RetroCap.jl)
 
 RetroCap retroactively add "caps" (upper-bounded `[compat]` entries) to all
-packages in a registry.
+packages in one or more Julia package registries.
 
-More specifically, RetroCap adds upper-bounded `[compat]` entries to every
-version of every package in a
-registry **except the latest version of each package**.
+More specifically, RetroCap iterates over each registry in a list of one
+or more registries. For each registry, RetroCap iterates over each package
+in the registry. For each package, RetroCap iterates over each of the
+package's dependencies. For each dependency:
+- If the package does not have a `[compat]` entry for the dependency, then RetroCap adds an upper-bounded `[compat]` entry for the dependency.
+- If the package has a `[compat]` entry for the dependency but the `[compat]` entry is not upper-bounded, then RetroCap replaces the original `[compat]` entry with an upper-bounded `[compat]` entry for the dependency.
 
 ## Installation
 ```julia
@@ -19,15 +22,20 @@ Pkg.add("RetroCap")
 
 ### Run on all repos in a registry
 
-The recommended strategy is `NoUpperBound`. The `NoUpperBound` strategy will:
-1. Add compat entries if they are missing
-2. Replace non-upper-bounded compat entries with upper-bounded compat entries
-
+To cap all versions of all packages, use the `CapLatestVersion()` option:
 ```julia
 julia> run(`git clone https://github.com/JuliaRegistries/General.git`)
 julia> cd("General")
 julia> using RetroCap
-julia> add_caps(NoUpperBound(), pwd())
+julia> add_caps(UpperBound(), CapLatestVersion(), pwd())
+```
+To cap all versions of all packages EXCEPT for the latest version of each
+package, use the `ExcludeLatestVersion()` option:
+```julia
+julia> run(`git clone https://github.com/JuliaRegistries/General.git`)
+julia> cd("General")
+julia> using RetroCap
+julia> add_caps(UpperBound(), ExcludeLatestVersion(), pwd())
 ```
 
 ### Run only on repos in a specific GitHub organization
@@ -51,7 +59,8 @@ pkg_to_path,
 
 for pkg in pkgs
     try
-        add_caps(NoUpperBound(),
+        add_caps(UpperBound(),
+                 CapLatestVersion(),
                  String[pwd()],
                  pkg_to_latest_version,
                  pkg_to_latest_zero_version,
