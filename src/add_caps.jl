@@ -3,19 +3,29 @@ import UUIDs
 
 @inline function add_caps(strategy::CapStrategy,
                           registry_path::AbstractString)
-    _registry_path = convert(String, registry_path)::String
-    add_caps(strategy, _registry_path)
+    _registry_paths = Any[registry_path]
+    add_caps(strategy, _registry_paths)
     return nothing
 end
 
 @inline function add_caps(strategy::CapStrategy,
-                          registry_path::String)
+                          registry_paths::AbstractVector)
+    _registry_paths = Vector{String}(undef, 0)
+    for path in registry_paths
+        push!(_registry_paths, strip(path))
+    end
+    add_caps(strategy, _registry_paths)
+    return nothing
+end
+
+@inline function add_caps(strategy::CapStrategy,
+                          registry_paths::Vector{String})
     pkg_to_path,
         pkg_to_num_versions,
         pkg_to_latest_version,
-        pkg_to_latest_zero_version = parse_registry(registry_path)
+        pkg_to_latest_zero_version = parse_registry(registry_paths)
     add_caps(strategy,
-             registry_path,
+             registry_paths,
              pkg_to_path,
              pkg_to_num_versions,
              pkg_to_latest_version,
@@ -24,7 +34,7 @@ end
 end
 
 @inline function add_caps(strategy::CapStrategy,
-                          registry_path::String,
+                          registry_paths::Vector{String},
                           pkg_to_path::AbstractDict{Package, String},
                           pkg_to_num_versions::AbstractDict{Package, Int},
                           pkg_to_latest_version::AbstractDict{Package, VersionNumber},
@@ -36,7 +46,7 @@ end
         @debug("Package $(i) of $(n)", pkg)
         pkg_path = pkg_to_path[pkg]::String
         add_caps(strategy,
-                 registry_path,
+                 registry_paths,
                  pkg_to_latest_version,
                  pkg_to_latest_zero_version,
                  pkg,
@@ -46,15 +56,15 @@ end
 end
 
 @inline function add_caps(strategy::CapStrategy,
-                          registry_path::String,
+                          registry_paths::Vector{String},
                           pkg_to_latest_version::AbstractDict{Package, VersionNumber},
                           pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
                           pkg::Package,
                           pkg_path::String)
-    all_versions = get_all_versions(registry_path, pkg_path)
+    all_versions = get_all_versions(pkg_path)
     latest_version = _get_latest_version(all_versions)
-    compat_toml = joinpath(registry_path, pkg_path, "Compat.toml")
-    deps_toml = joinpath(registry_path, pkg_path, "Deps.toml")
+    compat_toml = joinpath(pkg_path, "Compat.toml")
+    deps_toml = joinpath(pkg_path, "Deps.toml")
     if isfile(compat_toml) && isfile(deps_toml)
         compat = Compress.load(compat_toml)
         deps = Compress.load(deps_toml)
@@ -65,7 +75,7 @@ end
                 add_caps!(compat,
                           deps,
                           strategy,
-                          registry_path,
+                          registry_paths,
                           pkg_to_latest_version,
                           pkg_to_latest_zero_version,
                           pkg,
@@ -81,7 +91,7 @@ end
 @inline function add_caps!(compat::AbstractDict{VersionNumber, <:Any},
                            deps::AbstractDict{VersionNumber, <:Any},
                            strategy::CapStrategy,
-                           registry_path::String,
+                           registry_paths::Vector{String},
                            pkg_to_latest_version::AbstractDict{Package, VersionNumber},
                            pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
                            pkg::Package,

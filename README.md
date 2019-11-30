@@ -32,17 +32,11 @@ julia> add_caps(NoUpperBound(), pwd())
 
 ### Run only on repos in a specific GitHub organization
 
-First, define an environment variable named `GITHUB_AUTH` that contains a
-GitHub personal access token. Then, run the following script:
-
 ```julia
 using GitHub
-
 using RetroCap
 
-auth = GitHub.authenticate("ENV["GITHUB_AUTH"]")
-
-orgrepos, page_data = GitHub.repos("MY_GITHUB_ORGANIZATION", auth = auth)[1]
+orgrepos, page_data = GitHub.repos("MY_GITHUB_ORGANIZATION")
 
 run(`git clone https://github.com/JuliaRegistries/General.git`)
 
@@ -53,12 +47,12 @@ pkgs = [RetroCap.Package(r.name[1:end-3]) for r in orgrepos]
 pkg_to_path,
     pkg_to_num_versions,
     pkg_to_latest_version,
-    pkg_to_latest_zero_version = RetroCap.parse_registry(pwd())
+    pkg_to_latest_zero_version = RetroCap.parse_registry(String[pwd()])
 
 for pkg in pkgs
     try
         add_caps(NoUpperBound(),
-                 pwd(),
+                 String[pwd()],
                  pkg_to_latest_version,
                  pkg_to_latest_zero_version,
                  pkg,

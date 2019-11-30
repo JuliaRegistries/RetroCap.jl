@@ -57,9 +57,9 @@ Test.@testset "RetroCap.jl" begin
     Test.@testset "Run on the General registry" begin
         RetroCap.with_temp_dir() do tmp_dir
             cd(tmp_dir)
-            run(`git clone https://github.com/JuliaRegistries/General.git`)
-            cd("General")
-            a = joinpath("D", "DiffEqPhysics", "Compat.toml")
+            run(`git clone https://github.com/JuliaRegistries/General.git General`)
+            run(`git clone https://github.com/BioJulia/BioJuliaRegistry.git BioJuliaRegistry`)
+            a = joinpath("General", "D", "DiffEqPhysics", "Compat.toml")
             rm(a)
             open(a, "w") do io
                 s = """
@@ -94,7 +94,8 @@ StaticArrays = "0.10-0.12"
                 println(io, strip(s))
                 println(io)
             end
-            RetroCap.add_caps(RetroCap.NoUpperBound(), strip(pwd()))
+            RetroCap.add_caps(RetroCap.NoUpperBound(), "General")
+            RetroCap.add_caps(RetroCap.NoUpperBound(), Any["General", "BioJuliaRegistry"])
         end
     end
 end
