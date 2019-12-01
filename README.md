@@ -9,7 +9,9 @@ packages in one or more Julia package registries.
 More specifically, RetroCap iterates over each registry in a list of one
 or more registries. For each registry, RetroCap iterates over each package
 in the registry. For each package, RetroCap iterates over each of the
-package's dependencies. For each dependency:
+package's registered versions. For each registered version of the package,
+RetroCap iterates over each of the package's dependencies. For each
+dependency:
 - If the package does not have a `[compat]` entry for the dependency, then RetroCap adds an upper-bounded `[compat]` entry for the dependency.
 - If the package has a `[compat]` entry for the dependency but the `[compat]` entry is not upper-bounded, then RetroCap replaces the original `[compat]` entry with an upper-bounded `[compat]` entry for the dependency.
 
