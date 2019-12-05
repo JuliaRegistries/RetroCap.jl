@@ -93,4 +93,31 @@ end
     end
 end
 
+@inline function _save_uncompressed(path::String,
+                                    uncompressed::Dict,
+                                    versions::Vector{VersionNumber} = load_versions(path))
+    uncompressed_str = _make_keys_strings(uncompressed)
+    open(path, write=true) do io
+        TOML.print(io, uncompressed_str, sorted=true)
+    end
+end
+
+@inline function _make_keys_strings(uncompressed::Dict)
+    result = Dict{Any, Any}()
+    for k in keys(uncompressed)
+        v = uncompressed[k]
+        new_k = _my_string(k)
+        result[new_k] = v
+    end
+    return result
+end
+
+@inline function _my_string(x)::String
+    return String(x)
+end
+
+@inline function _my_string(v::VersionNumber)::String
+    return string(v)
+end
+
 end # module
