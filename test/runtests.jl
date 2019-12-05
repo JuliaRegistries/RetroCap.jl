@@ -3,8 +3,8 @@ import RetroCap
 import Test
 
 Test.@testset "RetroCap.jl" begin
-    Test.@testset "Compress.jl" begin
-        include("test_Compress.jl")
+    Test.@testset "compress.jl" begin
+        include("test_compress.jl")
     end
     Test.@testset "assert.jl" begin
         Test.@test_nowarn RetroCap.always_assert(true)

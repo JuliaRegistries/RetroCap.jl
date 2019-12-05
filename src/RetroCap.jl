@@ -6,7 +6,7 @@ export add_caps
 
 include("types.jl")
 
-include("Compress.jl")
+include("compress.jl")
 
 include("add_caps.jl")
 include("assert.jl")
