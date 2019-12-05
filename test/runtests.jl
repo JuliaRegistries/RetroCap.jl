@@ -3,9 +3,15 @@ import RetroCap
 import Test
 
 Test.@testset "RetroCap.jl" begin
-    Test.@testset "compress.jl" begin
-        include("test_compress.jl")
+    Test.@testset "Compress submodule" begin
+        Test.@testset "compress_main.jl" begin
+            include("test_compress_main.jl")
+        end
+        Test.@testset "recompress.jl" begin
+            include("test_recompress.jl")
+        end
     end
+    
     Test.@testset "assert.jl" begin
         Test.@test_nowarn RetroCap.always_assert(true)
         Test.@test RetroCap.always_assert(true) isa Nothing
@@ -54,7 +60,7 @@ Test.@testset "RetroCap.jl" begin
             Test.@test v"2.0.0" == RetroCap.next_breaking_release(v"1.0.0")
         end
     end
-    Test.@testset "Run on the General registry" begin
+    Test.@testset "Run RetroCap on the General registry" begin
         RetroCap.with_temp_dir() do tmp_dir
             cd(tmp_dir)
             

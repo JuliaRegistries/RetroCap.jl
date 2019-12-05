@@ -1,10 +1,5 @@
-module Compress
-
 import Pkg
 import UUIDs
-
-import Pkg.TOML
-import Pkg.Types: VersionSpec, VersionRange, VersionBound
 
 @inline is_jll_name(name::AbstractString) = endswith(name, "_jll")
 
@@ -24,17 +19,17 @@ includes all versions in `subset` and none of the versions in its complement.
     subset = sort!(drop_build_prerelease.(subset))
 
     complement = sort!(setdiff(pool, subset))
-    ranges = VersionRange[]
+    ranges = Pkg.Types.VersionRange[]
     @label again
-    isempty(subset) && return VersionSpec(ranges)
+    isempty(subset) && return Pkg.Types.VersionSpec(ranges)
     a = first(subset)
     for b in reverse(subset)
         a.major == b.major || continue
         for m = 1:3
-            lo = VersionBound((a.major, a.minor, a.patch)[1:m]...)
+            lo = Pkg.Types.VersionBound((a.major, a.minor, a.patch)[1:m]...)
             for n = 1:3
-                hi = VersionBound((b.major, b.minor, b.patch)[1:n]...)
-                r = VersionRange(lo, hi)
+                hi = Pkg.Types.VersionBound((b.major, b.minor, b.patch)[1:n]...)
+                r = Pkg.Types.VersionRange(lo, hi)
                 if !any(v in r for v in complement)
                     filter!(!in(r), subset)
                     push!(ranges, r)
@@ -51,16 +46,16 @@ end
 
 @inline function load_versions(path::String)
     versions_file = joinpath(dirname(path), "Versions.toml")
-    versions_dict = TOML.parsefile(versions_file)
+    versions_dict = Pkg.TOML.parsefile(versions_file)
     sort!([VersionNumber(v) for v in keys(versions_dict)])
 end
 
 @inline function load(path::String,
                       versions::Vector{VersionNumber} = load_versions(path))
-    compressed = TOML.parsefile(path)
+    compressed = Pkg.TOML.parsefile(path)
     uncompressed = Dict{VersionNumber,Dict{Any,Any}}()
     for (vers, data) in compressed
-        vs = VersionSpec(vers)
+        vs = Pkg.Types.VersionSpec(vers)
         for v in versions
             v in vs || continue
             merge!(get!(uncompressed, v, Dict()), deepcopy(data))
@@ -74,7 +69,7 @@ end
                           versions::Vector{VersionNumber} = load_versions(path))
     inverted = Dict()
     for (ver, data) in uncompressed, (key, val) in data
-        val isa TOML.TYPE || (val = string(val))
+        val isa Pkg.TOML.TYPE || (val = string(val))
         push!(get!(inverted, key => val, VersionNumber[]), ver)
     end
     compressed = Dict()
@@ -91,7 +86,7 @@ end
                       versions::Vector{VersionNumber} = load_versions(path))
     compressed = compress(path, uncompressed)
     open(path, write=true) do io
-        TOML.print(io, compressed, sorted=true)
+        Pkg.TOML.print(io, compressed, sorted=true)
     end
 end
 
@@ -100,7 +95,7 @@ end
                                     versions::Vector{VersionNumber} = load_versions(path))
     uncompressed_str = _make_keys_strings(uncompressed)
     open(path, write=true) do io
-        TOML.print(io, uncompressed_str, sorted=true)
+        Pkg.TOML.print(io, uncompressed_str, sorted=true)
     end
 end
 
@@ -121,5 +116,3 @@ end
 @inline function _my_string(v::VersionNumber)::String
     return string(v)
 end
-
-end # module
