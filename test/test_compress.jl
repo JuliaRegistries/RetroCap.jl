@@ -45,22 +45,28 @@ end
 end
 
 @testset "_save_uncompressed" begin
-    RetroCap.with_temp_dir() do
-        run(`git clone https://github.com/JuliaRegistries/General.git`)
-        cd("General")
-        cd("P")
-        cd("PredictMD")
-        compat = Compress.load("Compat.toml")
-        rm("Compat.toml"; force = true, recursive = true)
-        Compress._save_uncompressed("Compat.toml", compat)
-        deps = Compress.load("Deps.toml")
-        rm("Deps.toml"; force = true, recursive = true)
-        Compress._save_uncompressed("Deps.toml", deps)
-        compat = Compress.load("Compat.toml")
-        rm("Compat.toml"; force = true, recursive = true)
-        Compress.save("Compat.toml", compat)
-        deps = Compress.load("Deps.toml")
-        rm("Deps.toml"; force = true, recursive = true)
-        Compress.save("Deps.toml", deps)
-    end
+    # RetroCap.with_temp_dir() do
+    original_directory = pwd()
+    tmp_dir = mktempdir()
+    atexit(() -> rm(tmp_dir; force = true, recursive = true))
+    cd(tmp_dir)
+    run(`git clone https://github.com/JuliaRegistries/General.git`)
+    cd("General")
+    cd("P")
+    cd("PredictMD")
+    compat = Compress.load("Compat.toml")
+    rm("Compat.toml"; force = true, recursive = true)
+    Compress._save_uncompressed("Compat.toml", compat)
+    deps = Compress.load("Deps.toml")
+    rm("Deps.toml"; force = true, recursive = true)
+    Compress._save_uncompressed("Deps.toml", deps)
+    compat = Compress.load("Compat.toml")
+    rm("Compat.toml"; force = true, recursive = true)
+    Compress.save("Compat.toml", compat)
+    deps = Compress.load("Deps.toml")
+    rm("Deps.toml"; force = true, recursive = true)
+    Compress.save("Deps.toml", deps)
+    cd(original_directory)
+    rm(tmp_dir; force = true, recursive = true)
+    # end
 end
