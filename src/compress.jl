@@ -6,6 +6,8 @@ import UUIDs
 import Pkg.TOML
 import Pkg.Types: VersionSpec, VersionRange, VersionBound
 
+@inline is_jll_name(name::AbstractString) = endswith(name, "_jll")
+
 """
     compress_versions(pool::Vector{VersionNumber}, subset::Vector{VersionNumber})
 
