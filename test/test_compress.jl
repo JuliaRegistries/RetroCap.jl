@@ -39,13 +39,13 @@ end
 @testset "_make_keys_strings" begin
     a = Dict{Any, Any}()
     a[v"1.2.3"] = "foo"
-    @test eltype([collect(keys(a))...]) == VersionNumber
-    b = _make_keys_strings(a)
-    @test eltype([collect(keys(b))...]) == VersionNumber
+    @test eltype([collect(keys(a))...]) <: VersionNumber
+    b = Compress._make_keys_strings(a)
+    @test eltype([collect(keys(b))...]) <: AbstractString
 end
 
 @testset "_save_uncompressed" begin
-    with_temp_dir() do
+    RetroCap.with_temp_dir() do
         run(`git clone https://github.com/JuliaRegistries/General.git`)
         cd("General")
         cd("P")
