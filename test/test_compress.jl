@@ -45,28 +45,44 @@ end
 end
 
 @testset "_save_uncompressed" begin
-    # RetroCap.with_temp_dir() do
-    original_directory = pwd()
-    tmp_dir = mktempdir()
-    atexit(() -> rm(tmp_dir; force = true, recursive = true))
-    cd(tmp_dir)
-    run(`git clone https://github.com/JuliaRegistries/General.git`)
-    cd("General")
-    cd("P")
-    cd("PredictMD")
-    compat = Compress.load("Compat.toml")
-    rm("Compat.toml"; force = true, recursive = true)
-    Compress._save_uncompressed("Compat.toml", compat)
-    deps = Compress.load("Deps.toml")
-    rm("Deps.toml"; force = true, recursive = true)
-    Compress._save_uncompressed("Deps.toml", deps)
-    compat = Compress.load("Compat.toml")
-    rm("Compat.toml"; force = true, recursive = true)
-    Compress.save("Compat.toml", compat)
-    deps = Compress.load("Deps.toml")
-    rm("Deps.toml"; force = true, recursive = true)
-    Compress.save("Deps.toml", deps)
-    cd(original_directory)
-    rm(tmp_dir; force = true, recursive = true)
-    # end
+    RetroCap.with_temp_dir() do tmp_dir
+        cd(tmp_dir)
+        run(`git clone https://github.com/JuliaRegistries/General.git`)
+        cd(joinpath(tmp_dir, "General", "P", "PredictMD"))
+        compat = Compress.load("Compat.toml")
+        rm("Compat.toml"; force = true, recursive = true)
+        Compress._save_uncompressed("Compat.toml", compat)
+        deps = Compress.load("Deps.toml")
+        rm("Deps.toml"; force = true, recursive = true)
+        Compress._save_uncompressed("Deps.toml", deps)
+        compat = Compress.load("Compat.toml")
+        rm("Compat.toml"; force = true, recursive = true)
+        Compress.save("Compat.toml", compat)
+        deps = Compress.load("Deps.toml")
+        rm("Deps.toml"; force = true, recursive = true)
+        Compress.save("Deps.toml", deps)
+    end
+end
+
+@testset "_save_uncompressed" begin
+    this_file = @__FILE__
+    test_directory = dirname(this_file)
+    package_root = dirname(test_directory)
+    bin_directory = joinpath(package_root, "bin")
+    recompress_script = joinpath(bin_directory, "recompress.jl")
+    RetroCap.with_temp_dir() do tmp_dir
+        original_depot_path = deepcopy(Base.DEPOT_PATH)
+        depot = tmp_dir
+        mkpath(joinpath(depot, "registries"))
+        cd(joinpath(depot, "registries"))
+        run(`git clone https://github.com/JuliaRegistries/General.git`)
+        empty!(Base.DEPOT_PATH)
+        pushfirst!(Base.DEPOT_PATH, depot)
+        cd(tmp_dir)
+        include(recompress_script)
+        empty!(Base.DEPOT_PATH)
+        for x in original_depot_path
+            push!(Base.DEPOT_PATH, x)
+        end
+    end
 end

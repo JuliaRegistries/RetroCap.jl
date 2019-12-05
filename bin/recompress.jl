@@ -11,10 +11,13 @@ const packages = TOML.parsefile(registry_file)["packages"]
 const version_map = Dict{String,Vector{VersionNumber}}()
 
 for (uuid, info) in packages
-    path = joinpath(registry_path, info["path"])
-    versions_file = joinpath(path, "Versions.toml")
-    versions = Compress.load(versions_file)
-    version_map[uuid] = sort!(collect(keys(versions)))
+    name = info["name"]
+    if !Compress.is_jll_name(name)
+        path = joinpath(registry_path, info["path"])
+        versions_file = joinpath(path, "Versions.toml")
+        versions = Compress.load(versions_file)
+        version_map[uuid] = sort!(collect(keys(versions)))
+    end
 end
 
 for (_, info) in packages
