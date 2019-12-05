@@ -45,7 +45,8 @@ end
 end
 
 @testset "_save_uncompressed" begin
-    # RetroCap.with_temp_dir() do
+    RetroCap.with_temp_dir() do
+    end
     original_directory = pwd()
     tmp_dir = mktempdir()
     atexit(() -> rm(tmp_dir; force = true, recursive = true))
@@ -68,5 +69,4 @@ end
     Compress.save("Deps.toml", deps)
     cd(original_directory)
     rm(tmp_dir; force = true, recursive = true)
-    # end
 end
