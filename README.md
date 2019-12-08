@@ -52,7 +52,14 @@ run(`git clone https://github.com/JuliaRegistries/General.git`)
 
 cd("General")
 
-pkgs = [RetroCap.Package(r.name[1:end-3]) for r in orgrepos]
+pkgs = RetroCap.Package[]
+for r in orgrepos
+    name = r.name
+    if endswith(name, ".jl")
+        push!(pkgs, RetroCap.Package(name[1:end-3]))
+    end
+end
+unique!(pkgs)
 
 pkg_to_path,
     pkg_to_num_versions,
