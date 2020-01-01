@@ -10,6 +10,9 @@ abstract type CapStrategy end
 struct UpperBound <: CapStrategy
 end
 
+struct MonotonicUpperBound <: CapStrategy
+end
+
 abstract type LatestVersionOption end
 
 struct ExcludeLatestVersion <: LatestVersionOption

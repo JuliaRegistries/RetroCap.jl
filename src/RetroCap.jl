@@ -1,6 +1,6 @@
 module RetroCap
 
-export CapStrategy, UpperBound
+export CapStrategy, UpperBound, MonotonicUpperBound
 export LatestVersionOption, CapLatestVersion, ExcludeLatestVersion
 export add_caps
 

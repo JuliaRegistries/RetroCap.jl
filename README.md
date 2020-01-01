@@ -15,6 +15,10 @@ dependency:
 - If the package does not have a `[compat]` entry for the dependency, then RetroCap adds an upper-bounded `[compat]` entry for the dependency.
 - If the package has a `[compat]` entry for the dependency but the `[compat]` entry is not upper-bounded, then RetroCap replaces the original `[compat]` entry with an upper-bounded `[compat]` entry for the dependency.
 
+There are two main "strategies" for adding bounds:
+- `UpperBound` ensures the application of upper bounds, adding the latest version as an upper bound if needed.
+- `MonotonicUpperBound` ensures that upper bounds are "monotonic," meaning that older releases have older dependencies.
+
 ## Installation
 ```julia
 Pkg.add("RetroCap")
@@ -29,7 +33,7 @@ To cap all versions of all packages, use the `CapLatestVersion()` option:
 julia> run(`git clone https://github.com/JuliaRegistries/General.git`)
 julia> cd("General")
 julia> using RetroCap
-julia> add_caps(UpperBound(), CapLatestVersion(), pwd())
+julia> add_caps(UpperBound(), CapLatestVersion(), pwd())  # or use MonotonicUpperBound
 ```
 To cap all versions of all packages EXCEPT for the latest version of each
 package, use the `ExcludeLatestVersion()` option:
@@ -68,7 +72,7 @@ pkg_to_path,
 
 for pkg in pkgs
     try
-        add_caps(UpperBound(),
+        add_caps(MonotonicUpperBound(),    # or use `UpperBound()`
                  CapLatestVersion(),
                  String[pwd()],
                  pkg_to_latest_version,
@@ -83,4 +87,4 @@ end
 
 ## Acknowledgements
 
-- This work was supported in part by National Institutes of Health grants U54GM115677, R01LM011963, and R25MH116440. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
+- This work was supported in part by National Institutes of Health grants U54GM115677, R01LM011963, R25MH116440, and R01DC010381. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.

@@ -230,3 +230,19 @@ end
 end
 
 @inline next_breaking_release(::Nothing) = v"0.0.0"
+
+function monotonize!(pkgbounds, compat)
+    for (dep, bnd) in compat
+        pkgdep = Package(dep)
+        if haskey(pkgbounds, pkgdep)
+            spec = _entry_to_spec(bnd)
+            upper = VersionNumber(spec.ranges[end].upper.t)
+            upper == v"0.0.0" && continue
+            current_upper = pkgbounds[pkgdep]
+            if current_upper === nothing || current_upper == v"0.0.0" || upper < current_upper
+                pkgbounds[pkgdep] = upper
+            end
+        end
+    end
+    return pkgbounds
+end

@@ -95,6 +95,56 @@ end
     return nothing
 end
 
+@inline function add_caps(strategy::MonotonicUpperBound,
+                          option::LatestVersionOption,
+                          registry_paths::Vector{String},
+                          pkg_to_latest_version::AbstractDict{Package, VersionNumber},
+                          pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
+                          pkg::Package,
+                          pkg_path::String)
+    option isa CapLatestVersion || error("MonotonicUpperBound requires CapLatestVersion")
+    all_versions = get_all_versions(pkg_path)
+    latest_version = _get_latest_version(all_versions)
+    compat_toml = joinpath(pkg_path, "Compat.toml")
+    deps_toml = joinpath(pkg_path, "Deps.toml")
+    if isfile(compat_toml) && isfile(deps_toml)
+        compat = Compress.load(compat_toml)
+        deps = Compress.load(deps_toml)
+        m = length(all_versions)
+        # Bound the latest version
+        version = all_versions[end]
+        add_caps!(compat,
+                  deps,
+                  UpperBound(),
+                  registry_paths,
+                  pkg_to_latest_version,
+                  pkg_to_latest_zero_version,
+                  pkg,
+                  pkg_path,
+                  version)
+        # Propagate the bounds backwards
+        for j = m-1:-1:1
+            lastcompat = compat[version]
+            version = all_versions[j]
+            pkg_to_latest_version_tmp = copy(pkg_to_latest_version)
+            pkg_to_latest_zero_version_tmp = copy(pkg_to_latest_zero_version)
+            monotonize!(pkg_to_latest_version_tmp, lastcompat)
+            monotonize!(pkg_to_latest_zero_version_tmp, lastcompat)
+            add_caps!(compat,
+                      deps,
+                      UpperBound(),
+                      registry_paths,
+                      pkg_to_latest_version_tmp,
+                      pkg_to_latest_zero_version_tmp,
+                      pkg,
+                      pkg_path,
+                      version)
+        end
+        Compress.save(compat_toml, compat)
+    end
+    return nothing
+end
+
 @inline function add_caps!(compat::AbstractDict{VersionNumber, <:Any},
                            deps::AbstractDict{VersionNumber, <:Any},
                            strategy::CapStrategy,
