@@ -105,6 +105,7 @@ end
                            pkg_path::String,
                            version::VersionNumber)
     if haskey(deps, version)
+        get!(() -> Dict{Any, Any}(), compat, version)
         always_assert(haskey(compat, version))
         for dep in keys(deps[version])
             if !is_stdlib(dep) && !is_jll(dep)
