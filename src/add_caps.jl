@@ -106,6 +106,7 @@ end
                            version::VersionNumber)
     if haskey(deps, version)
         always_assert(haskey(compat, version))
+        println(typeof(compat[version]))
         for dep in keys(deps[version])
             if !is_stdlib(dep) && !is_jll(dep)
                 latest_dep_version = pkg_to_latest_version[Package(dep)]
