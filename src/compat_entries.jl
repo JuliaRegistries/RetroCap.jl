@@ -84,9 +84,7 @@ end
 
 @inline function _entry_piece_to_ranges(piece::String)::Vector{Pkg.Types.VersionRange}
     try
-        spec = Pkg.Types.semver_spec(piece)
-        ranges = spec.ranges
-        return ranges
+        return Pkg.Types.semver_spec(piece).ranges
     catch
     end
     r = Pkg.Types.VersionRange(piece)
