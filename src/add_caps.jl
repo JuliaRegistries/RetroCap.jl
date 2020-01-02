@@ -107,7 +107,6 @@ end
     if haskey(deps, version)
         get!(() -> Dict{Any, Any}(), compat, version)
         always_assert(haskey(compat, version))
-        println(typeof(compat[version]))
         for dep in keys(deps[version])
             if !is_stdlib(dep) && !is_jll(dep)
                 latest_dep_version = pkg_to_latest_version[Package(dep)]
