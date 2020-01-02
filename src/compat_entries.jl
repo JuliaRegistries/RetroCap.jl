@@ -82,13 +82,27 @@ end
     end
 end
 
+@inline function _entry_piece_to_ranges(piece::String)::Vector{Pkg.Types.VersionRange}
+    try
+        spec = Pkg.Types.semver_spec(piece)
+        ranges = spec.ranges
+        return ranges
+    catch
+    end
+    r = Pkg.Types.VersionRange(piece)
+    return Pkg.Types.VersionRange[r]
+end
+
 @inline function _entry_to_spec(current_compat_entry::String)::Pkg.Types.VersionSpec
     try
         return Pkg.Types.semver_spec(current_compat_entry)
     catch
     end
-    r = Pkg.Types.VersionRange(current_compat_entry)
-    ranges = Pkg.Types.VersionRange[r]
+    pieces::Vector{String} = strip.(split(strip(rstrip(lstrip(strip(current_compat_entry), '['), ']')), ','))
+    ranges = Vector{Pkg.Types.VersionRange}(undef, 0)
+    for piece in pieces
+        append!(ranges, _entry_piece_to_ranges(piece))
+    end
     spec = Pkg.Types.VersionSpec(ranges)
     return spec
 end
