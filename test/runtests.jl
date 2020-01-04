@@ -1,6 +1,7 @@
 import Pkg
 import RetroCap
 import Test
+using UUIDs
 
 Test.@testset "RetroCap.jl" begin
     Test.@testset "Compress submodule" begin
@@ -11,7 +12,7 @@ Test.@testset "RetroCap.jl" begin
             include("test_recompress.jl")
         end
     end
-    
+
     Test.@testset "assert.jl" begin
         Test.@test_nowarn RetroCap.always_assert(true)
         Test.@test RetroCap.always_assert(true) isa Nothing
@@ -60,18 +61,117 @@ Test.@testset "RetroCap.jl" begin
             Test.@test v"2.0.0" == RetroCap.next_breaking_release(v"1.0.0")
         end
     end
+    Test.@testset "Monotonic" begin
+        RetroCap.with_temp_dir() do tmp_dir
+            cd(tmp_dir) do
+                # Create a fake registry
+                mkdir("Fake")
+                pkga = joinpath("Fake", "A", "APkg")
+                pkgb = joinpath("Fake", "B", "BPkg")
+                pkgc = joinpath("Fake", "C", "CPkg")
+                uuida, uuidb, uuidc = uuid4(), uuid4(), uuid4()
+                uuidr = uuid4()
+                open(joinpath("Fake", "Registry.toml"), "w") do io
+                    println(io, """
+                    name = "Fake"
+                    uuid = "$uuidr"
+                    repo = "fake"
+
+                    [packages]
+                    $uuida = { name = "APkg", path = "A/APkg" }
+                    $uuidb = { name = "BPkg", path = "B/BPkg" }
+                    $uuidc = { name = "CPkg", path = "C/CPkg" }
+                    """)
+                end
+                map(mkpath, [pkga, pkgb, pkgc])
+                open(joinpath(pkga, "Versions.toml"), "w") do io
+                    println(io, """
+                    ["1.0.0"]
+                    git-tree-sha1 = "aa"
+
+                    ["2.0.0"]
+                    git-tree-sha1 = "bb"
+
+                    ["3.0.0"]
+                    git-tree-sha1 = "cc"
+                    """)
+                end
+                open(joinpath(pkgb, "Versions.toml"), "w") do io
+                    println(io, """
+                    ["0.1.0"]
+                    git-tree-sha1 = "aa"
+
+                    ["0.2.0"]
+                    git-tree-sha1 = "bb"
+                    """)
+                end
+                open(joinpath(pkgc, "Deps.toml"), "w") do io
+                    println(io, """
+                    [0]
+                    APkg = "$uuida"
+
+                    ["0.1-0.2"]
+                    BPkg = "$uuidb"
+                    """)
+                end
+                open(joinpath(pkgc, "Versions.toml"), "w") do io
+                    println(io, """
+                    ["0.1.0"]
+                    git-tree-sha1 = "aa"
+
+                    ["0.2.0"]
+                    git-tree-sha1 = "bb"
+
+                    ["0.3.0"]
+                    git-tree-sha1 = "cc"
+                    """)
+                end
+                open(joinpath(pkgc, "Compat.toml"), "w") do io
+                    println(io, """
+                    ["0.1.0"]
+                    APkg = "1-*"
+                    BPkg = "0.1-0"
+
+                    ["0.2.0"]
+                    APkg = "2"
+                    BPkg = "0.1-0.2"
+
+                    ["0.3.0"]
+                    APkg = "3"
+                    """)
+                end
+                RetroCap.add_caps(RetroCap.MonotonicUpperBound(), RetroCap.CapLatestVersion(), "Fake")
+                str = read(joinpath(pkgc, "Compat.toml"), String)
+                Test.@test str == """
+                ["0-0.1"]
+                APkg = "1.0.0 - 2"
+                BPkg = "0.1.0 - 0.2"
+
+                ["0.2"]
+                APkg = "2"
+                BPkg = "0.1-0.2"
+
+                ["0.3-0"]
+                APkg = "3"
+                """
+            end
+        end
+    end
     Test.@testset "Run RetroCap on the General registry" begin
         RetroCap.with_temp_dir() do tmp_dir
             cd(tmp_dir)
-            
+
             run(`git clone https://github.com/JuliaRegistries/General.git General`)
             run(`git clone https://github.com/BioJulia/BioJuliaRegistry.git BioJuliaRegistry`)
-            
+
             RetroCap.add_caps(RetroCap.UpperBound(), RetroCap.ExcludeLatestVersion(), "General")
             RetroCap.add_caps(RetroCap.UpperBound(), RetroCap.ExcludeLatestVersion(), Any["General", "BioJuliaRegistry"])
 
             RetroCap.add_caps(RetroCap.UpperBound(), RetroCap.CapLatestVersion(), "General")
             RetroCap.add_caps(RetroCap.UpperBound(), RetroCap.CapLatestVersion(), Any["General", "BioJuliaRegistry"])
+
+            RetroCap.add_caps(RetroCap.MonotonicUpperBound(), RetroCap.CapLatestVersion(), "General")
+            RetroCap.add_caps(RetroCap.MonotonicUpperBound(), RetroCap.CapLatestVersion(), Any["General", "BioJuliaRegistry"])
         end
     end
 end
