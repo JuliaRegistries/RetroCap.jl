@@ -102,7 +102,6 @@ end
                           pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
                           pkg::Package,
                           pkg_path::String)
-    option isa CapLatestVersion || error("MonotonicUpperBound requires CapLatestVersion")
     all_versions = get_all_versions(pkg_path)
     latest_version = _get_latest_version(all_versions)
     compat_toml = joinpath(pkg_path, "Compat.toml")
@@ -113,17 +112,25 @@ end
         m = length(all_versions)
         # Bound the latest version
         version = all_versions[end]
-        add_caps!(compat,
-                  deps,
-                  UpperBound(),
-                  registry_paths,
-                  pkg_to_latest_version,
-                  pkg_to_latest_zero_version,
-                  pkg,
-                  pkg_path,
-                  version)
+        if option isa CapLatestVersion
+            add_caps!(compat,
+                    deps,
+                    UpperBound(),
+                    registry_paths,
+                    pkg_to_latest_version,
+                    pkg_to_latest_zero_version,
+                    pkg,
+                    pkg_path,
+                    version)
+        elseif !isa(option, ExcludeLatestVersion())
+            error("add_caps requires ExcludeLatestVersion or CapLatestVersion option")
+        end
         # Propagate the bounds backwards
         for j = m-1:-1:1
+            if !haskey(compat, version)
+                @warn "$compat_toml is suspicious"
+                continue
+            end
             lastcompat = compat[version]
             version = all_versions[j]
             pkg_to_latest_version_tmp = copy(pkg_to_latest_version)
