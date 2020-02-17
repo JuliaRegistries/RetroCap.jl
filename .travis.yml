@@ -11,14 +11,16 @@ branches:
 #     - JULIA_DEBUG="all"
 
 julia:
+  - "1.1"
   - "1.2"
   - "1.3"
+  - nightly
 
 language: julia
 
 matrix:
   allow_failures:
-    - julia: nightly
+    # - julia: nightly
   fast_finish: true
 
 notifications:
