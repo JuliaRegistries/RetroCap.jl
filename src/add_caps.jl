@@ -158,9 +158,10 @@ end
         get!(() -> Dict{Any, Any}(), compat, version)
         always_assert(haskey(compat, version))
         for dep in keys(deps[version])
-            if !is_stdlib(dep) && !is_jll(dep)
-                latest_dep_version = pkg_to_latest_version[Package(dep)]
-                latest_dep_zero_version = pkg_to_latest_zero_version[Package(dep)]
+            pdep = Package(dep)
+            if !is_stdlib(dep) && !is_jll(dep) && haskey(pkg_to_latest_version, pdep)
+                latest_dep_version = pkg_to_latest_version[pdep]
+                latest_dep_zero_version = pkg_to_latest_zero_version[pdep]
                 current_compat_for_dep = _strip(get(compat[version], dep, ""))
                 new_compat_for_dep = generate_compat_entry(pkg,
                                                            Package(dep),
