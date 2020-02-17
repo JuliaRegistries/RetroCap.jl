@@ -18,7 +18,12 @@ end
 end
 
 @inline function is_stdlib(name::AbstractString)::Bool
-     return strip(name) in values(Pkg.Types.stdlib())
+    if isdefined(Pkg.Types, :stdlibs)
+        _stdlibs = Pkg.Types.stdlibs()
+    else
+        _stdlibs = Pkg.Types.stdlib()
+    end
+    return strip(name) in values(_stdlibs)
 end
 
 @inline function is_jll(name::AbstractString)::Bool
