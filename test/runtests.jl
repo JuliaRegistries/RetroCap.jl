@@ -37,6 +37,25 @@ Test.@testset "RetroCap.jl" begin
                                                                      Pkg.Types.semver_spec("0"),
                                                                      v"1.2.3",
                                                                      nothing)
+            Test.@test "0.0.0 - 1" == RetroCap.generate_compat_entry(RetroCap.Package("PkgA"),
+                                                                     RetroCap.Package("PkgB"),
+                                                                     RetroCap.UpperBound(),
+                                                                     [],
+                                                                     v"1.2.3",
+                                                                     nothing)
+            Test.@test "0.0.0 - 1" == RetroCap.generate_compat_entry(RetroCap.Package("PkgA"),
+                                                                     RetroCap.Package("PkgB"),
+                                                                     RetroCap.MonotonicUpperBound(),
+                                                                     [],
+                                                                     v"1.2.3",
+                                                                     nothing)
+        end
+        Test.@testset "next_breaking_release" begin
+            Test.@test v"0.0.0" == RetroCap.next_breaking_release(nothing)
+            Test.@test v"0.2.0" == RetroCap.next_breaking_release(v"0.1.0")
+            Test.@test v"2.0.0" == RetroCap.next_breaking_release(v"1.0.0")
+        end
+        Test.@testset "new_compat_entry" begin
         end
         Test.@testset "too_many_breaking_nonzero_versions" begin
             Test.@test !RetroCap.too_many_breaking_nonzero_versions(Pkg.Types.semver_spec("0"))
@@ -45,11 +64,6 @@ Test.@testset "RetroCap.jl" begin
         Test.@testset "too_many_breaking_zero_versions" begin
             Test.@test RetroCap.too_many_breaking_zero_versions(Pkg.Types.semver_spec("0"))
             Test.@test !RetroCap.too_many_breaking_zero_versions(Pkg.Types.semver_spec(">=1.2.3"))
-        end
-        Test.@testset "next_breaking_release" begin
-            Test.@test v"0.0.0" == RetroCap.next_breaking_release(nothing)
-            Test.@test v"0.2.0" == RetroCap.next_breaking_release(v"0.1.0")
-            Test.@test v"2.0.0" == RetroCap.next_breaking_release(v"1.0.0")
         end
     end
     Test.@testset "Monotonic" begin
