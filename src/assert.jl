@@ -1,6 +1,4 @@
-AlwaysAssertionError() = AlwaysAssertionError("")
-
-@inline function always_assert(cond::Bool)
-    cond || throw(AlwaysAssertionError())
+@inline function always_assert(cond::Bool, msg::String)
+    cond || throw(AlwaysAssertionError(msg))
     return nothing
 end

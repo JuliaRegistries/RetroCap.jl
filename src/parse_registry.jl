@@ -19,7 +19,7 @@ end
         return nothing
     else
         latest_zero_version = maximum(all_zero_versions)
-        always_assert(latest_zero_version < v"1")
+        always_assert(latest_zero_version < v"1", "latest_zero_version < v\"1\"")
         return latest_zero_version
     end
 end

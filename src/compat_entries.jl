@@ -121,7 +121,7 @@ end
                                        spec::Pkg.Types.VersionSpec,
                                        latest_dep_version::VersionNumber,
                                        latest_dep_zero_version::Union{VersionNumber, Nothing})
-    always_assert( length(current_compat_entry) > 0 )
+    always_assert(length(current_compat_entry) > 0, "length(current_compat_entry) > 0; pkg=$(pkg), dep=$(dep)")
     if is_unbounded_infinity(spec)
         return new_compat_entry(current_compat_entry, latest_dep_version)
     elseif is_unbounded_bad_zero(spec)

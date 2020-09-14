@@ -5,12 +5,12 @@ using UUIDs
 
 Test.@testset "RetroCap.jl" begin
     Test.@testset "assert.jl" begin
-        Test.@test_nowarn RetroCap.always_assert(true)
-        Test.@test RetroCap.always_assert(true) isa Nothing
-        Test.@test RetroCap.always_assert(true) == nothing
-        Test.@test Test.@test_nowarn RetroCap.always_assert(true) isa Nothing
-        Test.@test Test.@test_nowarn RetroCap.always_assert(true) == nothing
-        Test.@test_throws RetroCap.AlwaysAssertionError RetroCap.always_assert(false)
+        Test.@test_nowarn RetroCap.always_assert(true, "")
+        Test.@test RetroCap.always_assert(true, "") isa Nothing
+        Test.@test RetroCap.always_assert(true, "") == nothing
+        Test.@test Test.@test_nowarn RetroCap.always_assert(true, "") isa Nothing
+        Test.@test Test.@test_nowarn RetroCap.always_assert(true, "") == nothing
+        Test.@test_throws RetroCap.AlwaysAssertionError RetroCap.always_assert(false, "")
     end
     Test.@testset "compat_entries.jl" begin
         Test.@testset "_compute_cap_upper_bound" begin
