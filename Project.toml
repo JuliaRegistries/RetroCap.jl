@@ -1,14 +1,16 @@
 name = "RetroCap"
 uuid = "d77cfa7a-8890-4952-b292-ef424e435f4a"
-authors = ["Dilum Aluthge", "Brown Center for Biomedical Informatics"]
-version = "0.2.6"
+authors = ["Dilum Aluthge", "Brown Center for Biomedical Informatics", "Tim Holy", "contributors"]
+version = "1.0.0"
 
 [deps]
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+RegistryTools = "d1eb7eb1-105f-429d-abf5-b0f65cb9e2c4"
 UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
-julia = "1.1"
+RegistryTools = "1.5.3"
+julia = "1.5"
 
 [extras]
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
