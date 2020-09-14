@@ -1,4 +1,5 @@
 import Pkg
+import RegistryTools
 import UUIDs
 
 @inline function add_caps(strategy::CapStrategy,
@@ -73,8 +74,8 @@ end
     compat_toml = joinpath(pkg_path, "Compat.toml")
     deps_toml = joinpath(pkg_path, "Deps.toml")
     if isfile(compat_toml) && isfile(deps_toml)
-        compat = Compress.load(compat_toml)
-        deps = Compress.load(deps_toml)
+        compat = RegistryTools.Compress.load(compat_toml)
+        deps = RegistryTools.Compress.load(deps_toml)
         m = length(all_versions)
         for j = 1:m
             version = all_versions[j]
@@ -90,7 +91,7 @@ end
                           version)
             end
         end
-        Compress.save(compat_toml, compat)
+        RegistryTools.Compress.save(compat_toml, compat)
     end
     return nothing
 end
@@ -108,8 +109,8 @@ end
     compat_toml = joinpath(pkg_path, "Compat.toml")
     deps_toml = joinpath(pkg_path, "Deps.toml")
     if isfile(compat_toml) && isfile(deps_toml)
-        compat = Compress.load(compat_toml)
-        deps = Compress.load(deps_toml)
+        compat = RegistryTools.Compress.load(compat_toml)
+        deps = RegistryTools.Compress.load(deps_toml)
         m = length(all_versions)
         # Bound the latest version
         version = all_versions[end]
@@ -140,7 +141,7 @@ end
                       pkg_path,
                       version)
         end
-        Compress.save(compat_toml, compat)
+        RegistryTools.Compress.save(compat_toml, compat)
     end
     return nothing
 end

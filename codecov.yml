@@ -1,2 +1,0 @@
-ignore:
-  - "src/Compress/compress_main.jl"

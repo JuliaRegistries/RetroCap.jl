@@ -4,15 +4,6 @@ import Test
 using UUIDs
 
 Test.@testset "RetroCap.jl" begin
-    Test.@testset "Compress submodule" begin
-        Test.@testset "compress_main.jl" begin
-            include("test_compress_main.jl")
-        end
-        Test.@testset "recompress.jl" begin
-            include("test_recompress.jl")
-        end
-    end
-
     Test.@testset "assert.jl" begin
         Test.@test_nowarn RetroCap.always_assert(true)
         Test.@test RetroCap.always_assert(true) isa Nothing
@@ -162,16 +153,15 @@ Test.@testset "RetroCap.jl" begin
             cd(tmp_dir)
 
             run(`git clone https://github.com/JuliaRegistries/General.git General`)
-            run(`git clone https://github.com/BioJulia/BioJuliaRegistry.git BioJuliaRegistry`)
 
             RetroCap.add_caps(RetroCap.UpperBound(), RetroCap.ExcludeLatestVersion(), "General")
-            RetroCap.add_caps(RetroCap.UpperBound(), RetroCap.ExcludeLatestVersion(), Any["General", "BioJuliaRegistry"])
+            RetroCap.add_caps(RetroCap.UpperBound(), RetroCap.ExcludeLatestVersion(), Any["General", "General"])
 
             RetroCap.add_caps(RetroCap.UpperBound(), RetroCap.CapLatestVersion(), "General")
-            RetroCap.add_caps(RetroCap.UpperBound(), RetroCap.CapLatestVersion(), Any["General", "BioJuliaRegistry"])
+            RetroCap.add_caps(RetroCap.UpperBound(), RetroCap.CapLatestVersion(), Any["General", "General"])
 
             RetroCap.add_caps(RetroCap.MonotonicUpperBound(), RetroCap.CapLatestVersion(), "General")
-            RetroCap.add_caps(RetroCap.MonotonicUpperBound(), RetroCap.CapLatestVersion(), Any["General", "BioJuliaRegistry"])
+            RetroCap.add_caps(RetroCap.MonotonicUpperBound(), RetroCap.CapLatestVersion(), Any["General", "General"])
         end
     end
 end
