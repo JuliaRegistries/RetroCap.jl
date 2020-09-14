@@ -157,7 +157,7 @@ end
                            version::VersionNumber)
     if haskey(deps, version)
         get!(() -> Dict{Any, Any}(), compat, version)
-        always_assert(haskey(compat, version))
+        always_assert(haskey(compat, version), "haskey(compat, version); pkg=$(pkg)")
         for dep in keys(deps[version])
             pdep = Package(dep)
             if !is_stdlib(dep) && !is_jll(dep) && haskey(pkg_to_latest_version, pdep)
