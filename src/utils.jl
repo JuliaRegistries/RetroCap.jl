@@ -18,11 +18,7 @@ end
 end
 
 @inline function is_stdlib(name::AbstractString)::Bool
-    if isdefined(Pkg.Types, :stdlibs)
-        _stdlibs = Pkg.Types.stdlibs()
-    else
-        _stdlibs = Pkg.Types.stdlib()
-    end
+    _stdlibs = Pkg.Types.stdlibs()
     return strip(name) in values(_stdlibs)
 end
 
