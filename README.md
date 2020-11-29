@@ -1,7 +1,7 @@
 # RetroCap
 
-[![Build Status](https://github.com/bcbi/RetroCap.jl/workflows/CI/badge.svg)](https://github.com/bcbi/RetroCap.jl/actions)
-[![Coverage](https://codecov.io/gh/bcbi/RetroCap.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/bcbi/RetroCap.jl)
+[![Build Status](https://github.com/JuliaRegistries/RetroCap.jl/workflows/CI/badge.svg)](https://github.com/JuliaRegistries/RetroCap.jl/actions)
+[![Coverage](https://codecov.io/gh/JuliaRegistries/RetroCap.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaRegistries/RetroCap.jl)
 
 RetroCap retroactively add "caps" (upper-bounded `[compat]` entries) to all
 packages in one or more Julia package registries.
