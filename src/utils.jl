@@ -1,12 +1,12 @@
 import Pkg
 import UUIDs
 
-@inline function _strip(s::AbstractString)::String
+function _strip(s::AbstractString)::String
     result::String = convert(String, strip(s))::String
     return result
 end
 
-@inline function _strip(v::AbstractVector{<:AbstractString})::Vector{String}
+function _strip(v::AbstractVector{<:AbstractString})::Vector{String}
     result::Vector{String} = Vector{String}(undef, 0)
     for i = 1:length(v)
         v_i_stripped = _strip(v[i])::String
@@ -17,16 +17,16 @@ end
     return result
 end
 
-@inline function is_stdlib(name::AbstractString)::Bool
+function is_stdlib(name::AbstractString)::Bool
     _stdlibs = Pkg.Types.stdlibs()
     return strip(name) in values(_stdlibs)
 end
 
-@inline function is_jll(name::AbstractString)::Bool
+function is_jll(name::AbstractString)::Bool
     return endswith(lowercase(strip(name)), "_jll")
 end
 
-@inline function with_temp_dir(f::Function)
+function with_temp_dir(f::Function)
     original_dir = pwd()
     tmp_dir = mktempdir()
     atexit(() -> rm(tmp_dir; force = true, recursive = true))

@@ -1,17 +1,17 @@
 import Pkg
 import UUIDs
 
-@inline function new_compat_entry(current_compat_entry::Vector,
+function new_compat_entry(current_compat_entry::Vector,
                                   upper_version::VersionNumber)::String
     return new_compat_entry(upper_version)
 end
 
-@inline function new_compat_entry(latest_dep_version::VersionNumber)::String
+function new_compat_entry(latest_dep_version::VersionNumber)::String
     lower_bound = v"0"
     return new_compat_entry(lower_bound, latest_dep_version)
 end
 
-@inline function _extract_lower_bound(current_compat_entry::String)::VersionNumber
+function _extract_lower_bound(current_compat_entry::String)::VersionNumber
     myregex1 = r"([\d]*)\.([\d]*)\.([\d]*)[\s]*-[\s]*"
     myregex2 = r"([\d]*)\.([\d]*)[\s]*-[\s]*"
     myregex3 = r"(\d[\d]*)[\s]*-[\s]*"
@@ -29,13 +29,13 @@ end
     end
 end
 
-@inline function new_compat_entry(current_compat_entry::String,
-                                  upper_version::VersionNumber)::String
+function new_compat_entry(current_compat_entry::String,
+                          upper_version::VersionNumber)::String
     lower_bound = _extract_lower_bound(current_compat_entry)
     return new_compat_entry(lower_bound, upper_version)
 end
 
-@inline function _compute_cap_upper_bound(upper_version::VersionNumber)::String
+function _compute_cap_upper_bound(upper_version::VersionNumber)::String
     x = upper_version.major
     y = upper_version.minor
     z = upper_version.patch
@@ -50,8 +50,8 @@ end
     end
 end
 
-@inline function new_compat_entry(lower_bound::VersionNumber,
-                                  upper_version::VersionNumber)::String
+function new_compat_entry(lower_bound::VersionNumber,
+                          upper_version::VersionNumber)::String
     a = lower_bound.major
     b = lower_bound.minor
     c = lower_bound.patch
@@ -61,12 +61,12 @@ end
     return compat
 end
 
-@inline function generate_compat_entry(pkg::Package,
-                                       dep::Package,
-                                       strategy::CapStrategy,
-                                       current_compat_entry::Union{Vector, String},
-                                       latest_dep_version::VersionNumber,
-                                       latest_dep_zero_version::Union{VersionNumber, Nothing})
+function generate_compat_entry(pkg::Package,
+                               dep::Package,
+                               strategy::CapStrategy,
+                               current_compat_entry::Union{Vector, String},
+                               latest_dep_version::VersionNumber,
+                               latest_dep_zero_version::Union{VersionNumber, Nothing})
     if length(current_compat_entry) == 0
         return new_compat_entry(current_compat_entry,
                                 latest_dep_version)
@@ -82,7 +82,7 @@ end
     end
 end
 
-@inline function _entry_piece_to_ranges(piece::String)::Vector{Pkg.Types.VersionRange}
+function _entry_piece_to_ranges(piece::String)::Vector{Pkg.Types.VersionRange}
     try
         return Pkg.Types.semver_spec(piece).ranges
     catch
@@ -91,7 +91,7 @@ end
     return Pkg.Types.VersionRange[r]
 end
 
-@inline function _entry_to_spec(current_compat_entry::String)::Pkg.Types.VersionSpec
+function _entry_to_spec(current_compat_entry::String)::Pkg.Types.VersionSpec
     try
         return Pkg.Types.semver_spec(current_compat_entry)
     catch
@@ -105,7 +105,7 @@ end
     return spec
 end
 
-@inline function _entry_to_spec(current_compat_entry::Vector{String})::Pkg.Types.VersionSpec
+function _entry_to_spec(current_compat_entry::Vector{String})::Pkg.Types.VersionSpec
     n = length(current_compat_entry)
     ranges = Vector{Pkg.Types.VersionRange}(undef, n)
     for i = 1:n
@@ -114,13 +114,13 @@ end
     spec = Pkg.Types.VersionSpec(ranges)
 end
 
-@inline function generate_compat_entry(pkg::Package,
-                                       dep::Package,
-                                       strategy::UpperBound,
-                                       current_compat_entry::Union{Vector, String},
-                                       spec::Pkg.Types.VersionSpec,
-                                       latest_dep_version::VersionNumber,
-                                       latest_dep_zero_version::Union{VersionNumber, Nothing})
+function generate_compat_entry(pkg::Package,
+                               dep::Package,
+                               strategy::UpperBound,
+                               current_compat_entry::Union{Vector, String},
+                               spec::Pkg.Types.VersionSpec,
+                               latest_dep_version::VersionNumber,
+                               latest_dep_zero_version::Union{VersionNumber, Nothing})
     always_assert(length(current_compat_entry) > 0, "length(current_compat_entry) > 0; pkg=$(pkg), dep=$(dep)")
     if is_unbounded_infinity(spec)
         return new_compat_entry(current_compat_entry, latest_dep_version)
@@ -201,7 +201,7 @@ function too_many_breaking_zero_versions(spec::Pkg.Types.VersionSpec, cutoff::In
     end
 end
 
-@inline function includes_infinity(spec::Pkg.Types.VersionSpec)::Bool
+function includes_infinity(spec::Pkg.Types.VersionSpec)::Bool
     max_component = typemax(Base.VInt)
     x = typemax(VersionNumber)
     y = VersionNumber(max_component, max_component, max_component)
@@ -209,7 +209,7 @@ end
     return result
 end
 
-@inline function includes_bad_zero(spec::Pkg.Types.VersionSpec)::Bool
+function includes_bad_zero(spec::Pkg.Types.VersionSpec)::Bool
     max_component = typemax(Base.VInt)
     a = VersionNumber(0, max_component, 0)
     b = VersionNumber(0, max_component, max_component)
@@ -220,17 +220,17 @@ end
     return result
 end
 
-@inline function is_unbounded_infinity(spec::Pkg.Types.VersionSpec)::Bool
+function is_unbounded_infinity(spec::Pkg.Types.VersionSpec)::Bool
     # return includes_infinity(spec) | too_many_breaking_nonzero_versions(spec)
     return includes_infinity(spec)
 end
 
-@inline function is_unbounded_bad_zero(spec::Pkg.Types.VersionSpec)::Bool
+function is_unbounded_bad_zero(spec::Pkg.Types.VersionSpec)::Bool
     # return includes_bad_zero(spec) | too_many_breaking_zero_versions(spec)
     return includes_bad_zero(spec)
 end
 
-@inline function next_breaking_release(latest_version::VersionNumber)::VersionNumber
+function next_breaking_release(latest_version::VersionNumber)::VersionNumber
     if latest_version < v"1"
         major = 0
         minor = latest_version.minor + 1
@@ -241,7 +241,7 @@ end
     return VersionNumber(major, minor, 0)
 end
 
-@inline next_breaking_release(::Nothing) = v"0.0.0"
+next_breaking_release(::Nothing) = v"0.0.0"
 
 function monotonize!(pkgbounds, compat)
     for (dep, bnd) in compat

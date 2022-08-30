@@ -2,17 +2,17 @@ import Pkg
 import RegistryTools
 import UUIDs
 
-@inline function add_caps(strategy::CapStrategy,
-                          option::LatestVersionOption,
-                          registry_path::AbstractString)
+function add_caps(strategy::CapStrategy,
+                  option::LatestVersionOption,
+                  registry_path::AbstractString)
     _registry_paths = Any[registry_path]
     add_caps(strategy, option, _registry_paths)
     return nothing
 end
 
-@inline function add_caps(strategy::CapStrategy,
-                          option::LatestVersionOption,
-                          registry_paths::AbstractVector)
+function add_caps(strategy::CapStrategy,
+                  option::LatestVersionOption,
+                  registry_paths::AbstractVector)
     _registry_paths = Vector{String}(undef, 0)
     for path in registry_paths
         push!(_registry_paths, strip(path))
@@ -21,9 +21,9 @@ end
     return nothing
 end
 
-@inline function add_caps(strategy::CapStrategy,
-                          option::LatestVersionOption,
-                          registry_paths::Vector{String})
+function add_caps(strategy::CapStrategy,
+                  option::LatestVersionOption,
+                  registry_paths::Vector{String})
     pkg_to_path,
         pkg_to_num_versions,
         pkg_to_latest_version,
@@ -38,13 +38,13 @@ end
     return nothing
 end
 
-@inline function add_caps(strategy::CapStrategy,
-                          option::LatestVersionOption,
-                          registry_paths::Vector{String},
-                          pkg_to_path::AbstractDict{Package, String},
-                          pkg_to_num_versions::AbstractDict{Package, Int},
-                          pkg_to_latest_version::AbstractDict{Package, VersionNumber},
-                          pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}})
+function add_caps(strategy::CapStrategy,
+                  option::LatestVersionOption,
+                  registry_paths::Vector{String},
+                  pkg_to_path::AbstractDict{Package, String},
+                  pkg_to_num_versions::AbstractDict{Package, Int},
+                  pkg_to_latest_version::AbstractDict{Package, VersionNumber},
+                  pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}})
     all_pkgs = collect(keys(pkg_to_path))
     n = length(all_pkgs)
     for i = 1:n
@@ -62,13 +62,13 @@ end
     return nothing
 end
 
-@inline function add_caps(strategy::CapStrategy,
-                          option::LatestVersionOption,
-                          registry_paths::Vector{String},
-                          pkg_to_latest_version::AbstractDict{Package, VersionNumber},
-                          pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
-                          pkg::Package,
-                          pkg_path::String)
+function add_caps(strategy::CapStrategy,
+                  option::LatestVersionOption,
+                  registry_paths::Vector{String},
+                  pkg_to_latest_version::AbstractDict{Package, VersionNumber},
+                  pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
+                  pkg::Package,
+                  pkg_path::String)
     all_versions = get_all_versions(pkg_path)
     latest_version = _get_latest_version(all_versions)
     compat_toml = joinpath(pkg_path, "Compat.toml")
@@ -96,13 +96,13 @@ end
     return nothing
 end
 
-@inline function add_caps(strategy::MonotonicUpperBound,
-                          option::LatestVersionOption,
-                          registry_paths::Vector{String},
-                          pkg_to_latest_version::AbstractDict{Package, VersionNumber},
-                          pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
-                          pkg::Package,
-                          pkg_path::String)
+function add_caps(strategy::MonotonicUpperBound,
+                  option::LatestVersionOption,
+                  registry_paths::Vector{String},
+                  pkg_to_latest_version::AbstractDict{Package, VersionNumber},
+                  pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
+                  pkg::Package,
+                  pkg_path::String)
     option isa CapLatestVersion || error("MonotonicUpperBound requires CapLatestVersion")
     all_versions = get_all_versions(pkg_path)
     latest_version = _get_latest_version(all_versions)
@@ -146,15 +146,15 @@ end
     return nothing
 end
 
-@inline function add_caps!(compat::AbstractDict{VersionNumber, <:Any},
-                           deps::AbstractDict{VersionNumber, <:Any},
-                           strategy::CapStrategy,
-                           registry_paths::Vector{String},
-                           pkg_to_latest_version::AbstractDict{Package, VersionNumber},
-                           pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
-                           pkg::Package,
-                           pkg_path::String,
-                           version::VersionNumber)
+function add_caps!(compat::AbstractDict{VersionNumber, <:Any},
+                   deps::AbstractDict{VersionNumber, <:Any},
+                   strategy::CapStrategy,
+                   registry_paths::Vector{String},
+                   pkg_to_latest_version::AbstractDict{Package, VersionNumber},
+                   pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
+                   pkg::Package,
+                   pkg_path::String,
+                   version::VersionNumber)
     if haskey(deps, version)
         get!(() -> Dict{Any, Any}(), compat, version)
         always_assert(haskey(compat, version), "haskey(compat, version); pkg=$(pkg)")
