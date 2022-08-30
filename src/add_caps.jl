@@ -23,6 +23,25 @@ end
 
 function add_caps(strategy::CapStrategy,
                   option::LatestVersionOption,
+                  registry_path::AbstractString,
+                  pkg::Package)
+    _registry_paths = String[registry_path]
+    pkg_to_path,
+        pkg_to_num_versions,
+        pkg_to_latest_version,
+        pkg_to_latest_zero_version = parse_registry(_registry_paths)
+    add_caps(strategy,
+             option,
+             _registry_paths,
+             pkg_to_latest_version,
+             pkg_to_latest_zero_version,
+             pkg,
+             pkg_to_path[pkg])
+    return nothing
+end
+
+function add_caps(strategy::CapStrategy,
+                  option::LatestVersionOption,
                   registry_paths::Vector{String})
     pkg_to_path,
         pkg_to_num_versions,

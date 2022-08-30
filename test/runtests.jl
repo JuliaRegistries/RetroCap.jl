@@ -88,7 +88,7 @@ Test.@testset "RetroCap.jl" begin
                     $uuidc = { name = "CPkg", path = "C/CPkg" }
                     """)
                 end
-                map(mkpath, [pkga, pkgb, pkgc])
+                foreach(mkpath, [pkga, pkgb, pkgc])
                 open(joinpath(pkga, "Versions.toml"), "w") do io
                     println(io, """
                     ["1.0.0"]
@@ -159,6 +159,91 @@ Test.@testset "RetroCap.jl" begin
                 ["0.3-0"]
                 APkg = "3"
                 """
+            end
+        end
+        # Monotonic, single package
+        RetroCap.with_temp_dir() do tmp_dir
+            cd(tmp_dir) do
+                # Create a fake registry
+                mkdir("Fake")
+                pkga = joinpath("Fake", "A", "APkg")
+                pkgb = joinpath("Fake", "B", "BPkg")
+                pkgc = joinpath("Fake", "C", "CPkg")
+                uuida, uuidb, uuidc = uuid4(), uuid4(), uuid4()
+                uuidr = uuid4()
+                open(joinpath("Fake", "Registry.toml"), "w") do io
+                    println(io, """
+                    name = "Fake"
+                    uuid = "$uuidr"
+                    repo = "fake"
+
+                    [packages]
+                    $uuida = { name = "APkg", path = "A/APkg" }
+                    $uuidb = { name = "BPkg", path = "B/BPkg" }
+                    $uuidc = { name = "CPkg", path = "C/CPkg" }
+                    """)
+                end
+                foreach(mkpath, [pkga, pkgb, pkgc])
+                open(joinpath(pkga, "Versions.toml"), "w") do io
+                    println(io, """
+                    ["1.0.0"]
+                    git-tree-sha1 = "aa"
+
+                    ["2.0.0"]
+                    git-tree-sha1 = "bb"
+
+                    ["2.0.1"]
+                    git-tree-sha1 = "cc"
+                    """)
+                end
+                compatstr = """
+                ["1.0.0"]
+                APkg = "1-*"
+
+                ["1.1.0"]
+                APkg = "2"
+
+                ["1.1.1"]
+                APkg = "2.0.1"
+                """
+                for pkgo in (pkgb, pkgc)
+                    open(joinpath(pkgo, "Deps.toml"), "w") do io
+                        println(io, """
+                        [1-2]
+                        APkg = "$uuida"
+                        """)
+                    end
+                    open(joinpath(pkgo, "Versions.toml"), "w") do io
+                        println(io, """
+                        ["1.0.0"]
+                        git-tree-sha1 = "aa"
+
+                        ["1.1.0"]
+                        git-tree-sha1 = "bb"
+
+                        ["1.1.1"]
+                        git-tree-sha1 = "cc"
+                        """)
+                    end
+                    open(joinpath(pkgo, "Compat.toml"), "w") do io
+                        println(io, compatstr)
+                    end
+                end
+                RetroCap.add_caps(RetroCap.MonotonicUpperBound(), RetroCap.CapLatestVersion(), "Fake", RetroCap.Package("BPkg"))
+                str = read(joinpath(pkgb, "Compat.toml"), String)
+                targetstr = """
+                ["1.0"]
+                APkg = "1.0.0 - 2"
+
+                ["1.1.0"]
+                APkg = "2"
+
+                ["1.1.1-1"]
+                APkg = "2.0.1"
+                """
+                Test.@test str == targetstr
+                str = read(joinpath(pkgc, "Compat.toml"), String)
+                Test.@test strip(str) == strip(compatstr)
             end
         end
     end
