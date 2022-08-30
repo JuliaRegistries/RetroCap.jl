@@ -44,6 +44,15 @@ julia> using RetroCap
 julia> add_caps(UpperBound(), ExcludeLatestVersion(), pwd())
 ```
 
+### Run for a single package
+
+Navigate to the directory of a `git` clone of the registry (see the example above for "General") and then
+
+```julia
+julia> using RetroCap
+julia> add_caps(MonotonicUpperBound(), CapLatestVersion(), pwd(), RetroCap.Package("MyRegisteredPackage"))
+```
+
 ### Run only on repos in a specific GitHub organization
 
 ```julia
