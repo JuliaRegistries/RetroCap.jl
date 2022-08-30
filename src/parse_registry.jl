@@ -1,7 +1,7 @@
 import Pkg
 import UUIDs
 
-@inline function get_all_versions(pkg_path::String)::Vector{VersionNumber}
+function get_all_versions(pkg_path::String)::Vector{VersionNumber}
     versions_toml = Pkg.TOML.parsefile(joinpath(pkg_path, "Versions.toml"))
     all_versions = VersionNumber.(collect(keys(versions_toml)))
     unique!(all_versions)
@@ -9,11 +9,11 @@ import UUIDs
     return all_versions
 end
 
-@inline function _get_latest_version(versions::AbstractVector{VersionNumber})
+function _get_latest_version(versions::AbstractVector{VersionNumber})
     return maximum(versions)
 end
 
-@inline function _get_latest_zero_version(versions::AbstractVector{VersionNumber})
+function _get_latest_zero_version(versions::AbstractVector{VersionNumber})
     all_zero_versions = filter((x) -> (x < v"1"), versions)
     if isempty(all_zero_versions)
         return nothing
@@ -24,7 +24,7 @@ end
     end
 end
 
-@inline function parse_registry(registry_paths::Vector{String})
+function parse_registry(registry_paths::Vector{String})
     pkg_to_path = Dict{Package, String}()
     pkg_to_num_versions = Dict{Package, Int}()
     pkg_to_latest_version = Dict{Package, VersionNumber}()
@@ -40,11 +40,11 @@ end
            pkg_to_latest_zero_version
 end
 
-@inline function parse_registry!(pkg_to_path::AbstractDict{Package, String},
-                                 pkg_to_num_versions::AbstractDict{Package, Int},
-                                 pkg_to_latest_version::AbstractDict{Package, VersionNumber},
-                                 pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
-                                 registry_paths::Vector{String})
+function parse_registry!(pkg_to_path::AbstractDict{Package, String},
+                         pkg_to_num_versions::AbstractDict{Package, Int},
+                         pkg_to_latest_version::AbstractDict{Package, VersionNumber},
+                         pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
+                         registry_paths::Vector{String})
     for path in registry_paths
         parse_registry!(pkg_to_path,
                         pkg_to_num_versions,
@@ -58,11 +58,11 @@ end
            pkg_to_latest_zero_version
 end
 
-@inline function parse_registry!(pkg_to_path::AbstractDict{Package, String},
-                                 pkg_to_num_versions::AbstractDict{Package, Int},
-                                 pkg_to_latest_version::AbstractDict{Package, VersionNumber},
-                                 pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
-                                 registry_path::String)
+function parse_registry!(pkg_to_path::AbstractDict{Package, String},
+                         pkg_to_num_versions::AbstractDict{Package, Int},
+                         pkg_to_latest_version::AbstractDict{Package, VersionNumber},
+                         pkg_to_latest_zero_version::AbstractDict{Package, <:Union{VersionNumber, Nothing}},
+                         registry_path::String)
     registry = Pkg.TOML.parsefile(joinpath(registry_path, "Registry.toml"))
     packages = registry["packages"]
     for p in packages
